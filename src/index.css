@@ -4,33 +4,33 @@
 
 @layer base {
   :root {
-    --background: 80 25% 97%;
-    --foreground: 160 10% 15%;
+    --background: 200 15% 8%;
+    --foreground: 60 10% 92%;
 
-    --card: 0 0% 100%;
-    --card-foreground: 160 10% 15%;
+    --card: 200 12% 11%;
+    --card-foreground: 60 10% 92%;
 
-    --popover: 0 0% 100%;
-    --popover-foreground: 160 10% 15%;
+    --popover: 200 12% 11%;
+    --popover-foreground: 60 10% 92%;
 
-    --primary: 160 84% 39%;
-    --primary-foreground: 0 0% 100%;
+    --primary: 160 84% 45%;
+    --primary-foreground: 200 15% 5%;
 
-    --secondary: 80 30% 92%;
-    --secondary-foreground: 160 10% 15%;
+    --secondary: 200 10% 15%;
+    --secondary-foreground: 60 10% 85%;
 
-    --muted: 80 15% 94%;
-    --muted-foreground: 160 5% 45%;
+    --muted: 200 10% 14%;
+    --muted-foreground: 200 8% 55%;
 
     --accent: 43 96% 61%;
-    --accent-foreground: 160 10% 15%;
+    --accent-foreground: 200 15% 5%;
 
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 80 15% 90%;
-    --input: 80 15% 90%;
-    --ring: 160 84% 39%;
+    --border: 200 10% 16%;
+    --input: 200 10% 16%;
+    --ring: 160 84% 45%;
 
     --radius: 0.75rem;
 
@@ -38,23 +38,23 @@
     --solar-gold: 43 96% 61%;
     --solar-warm: 35 100% 65%;
     --solar-sky: 200 80% 70%;
-    --solar-emerald: 160 84% 39%;
-    --solar-leaf: 140 50% 75%;
-    --solar-sand: 40 30% 95%;
+    --solar-emerald: 160 84% 45%;
+    --solar-leaf: 140 40% 55%;
+    --solar-sand: 200 10% 14%;
 
     /* Glass */
-    --glass-bg: 0 0% 100% / 0.7;
-    --glass-border: 0 0% 100% / 0.3;
+    --glass-bg: 200 12% 13% / 0.7;
+    --glass-border: 200 12% 20% / 0.4;
 
     /* Sidebar */
-    --sidebar-background: 0 0% 100%;
-    --sidebar-foreground: 160 10% 25%;
-    --sidebar-primary: 160 84% 39%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 80 30% 95%;
-    --sidebar-accent-foreground: 160 10% 15%;
-    --sidebar-border: 80 15% 92%;
-    --sidebar-ring: 160 84% 39%;
+    --sidebar-background: 200 15% 6%;
+    --sidebar-foreground: 60 10% 75%;
+    --sidebar-primary: 160 84% 45%;
+    --sidebar-primary-foreground: 200 15% 5%;
+    --sidebar-accent: 200 10% 12%;
+    --sidebar-accent-foreground: 60 10% 90%;
+    --sidebar-border: 200 10% 14%;
+    --sidebar-ring: 160 84% 45%;
   }
 }
 
@@ -74,7 +74,7 @@
 
 @layer utilities {
   .glass-card {
-    @apply bg-white/70 backdrop-blur-xl border border-white/30 shadow-lg shadow-black/[0.03];
+    @apply bg-card/70 backdrop-blur-xl border border-white/[0.06] shadow-lg shadow-black/20;
   }
 
   .solar-gradient {
