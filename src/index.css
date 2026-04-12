@@ -4,57 +4,57 @@
 
 @layer base {
   :root {
-    --background: 210 20% 98%;
-    --foreground: 215 25% 15%;
+    --background: 0 0% 99%;
+    --foreground: 0 0% 9%;
 
     --card: 0 0% 100%;
-    --card-foreground: 215 25% 15%;
+    --card-foreground: 0 0% 9%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 215 25% 15%;
+    --popover-foreground: 0 0% 9%;
 
-    --primary: 210 60% 38%;
+    --primary: 245 58% 51%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 210 15% 93%;
-    --secondary-foreground: 215 20% 25%;
+    --secondary: 0 0% 96%;
+    --secondary-foreground: 0 0% 9%;
 
-    --muted: 210 12% 93%;
-    --muted-foreground: 215 10% 46%;
+    --muted: 0 0% 96%;
+    --muted-foreground: 0 0% 45%;
 
-    --accent: 168 55% 38%;
-    --accent-foreground: 0 0% 100%;
+    --accent: 0 0% 96%;
+    --accent-foreground: 0 0% 9%;
 
     --destructive: 0 72% 51%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 210 14% 89%;
-    --input: 210 14% 89%;
-    --ring: 210 60% 38%;
+    --border: 0 0% 92%;
+    --input: 0 0% 92%;
+    --ring: 245 58% 51%;
 
-    --radius: 0.625rem;
+    --radius: 0.5rem;
 
-    /* Solar custom tokens */
-    --solar-gold: 43 70% 50%;
-    --solar-warm: 35 65% 52%;
-    --solar-sky: 210 60% 50%;
-    --solar-emerald: 168 55% 38%;
-    --solar-leaf: 155 35% 42%;
-    --solar-sand: 210 12% 93%;
+    /* Solar custom tokens - muted for Linear style */
+    --solar-gold: 45 80% 52%;
+    --solar-warm: 35 60% 52%;
+    --solar-sky: 210 50% 50%;
+    --solar-emerald: 160 45% 42%;
+    --solar-leaf: 155 30% 42%;
+    --solar-sand: 0 0% 96%;
 
-    /* Glass */
-    --glass-bg: 0 0% 100% / 0.85;
-    --glass-border: 210 14% 85% / 0.5;
+    /* Glass - simplified */
+    --glass-bg: 0 0% 100% / 0.95;
+    --glass-border: 0 0% 92% / 0.8;
 
     /* Sidebar */
-    --sidebar-background: 0 0% 100%;
-    --sidebar-foreground: 215 20% 35%;
-    --sidebar-primary: 210 60% 38%;
+    --sidebar-background: 0 0% 98%;
+    --sidebar-foreground: 0 0% 40%;
+    --sidebar-primary: 245 58% 51%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 210 15% 96%;
-    --sidebar-accent-foreground: 215 25% 15%;
-    --sidebar-border: 210 14% 91%;
-    --sidebar-ring: 210 60% 38%;
+    --sidebar-accent: 0 0% 94%;
+    --sidebar-accent-foreground: 0 0% 9%;
+    --sidebar-border: 0 0% 92%;
+    --sidebar-ring: 245 58% 51%;
   }
 }
 
@@ -74,24 +74,21 @@
 
 @layer utilities {
   .glass-card {
-    @apply bg-card/80 backdrop-blur-xl border border-black/[0.04] shadow-lg shadow-black/5;
+    @apply bg-card border border-border;
   }
 
   .solar-gradient {
-    background: linear-gradient(135deg, hsl(var(--solar-emerald)), hsl(var(--solar-gold)));
+    background: hsl(var(--primary));
   }
 
   .solar-gradient-text {
-    background: linear-gradient(135deg, hsl(var(--solar-emerald)), hsl(var(--solar-gold)));
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+    color: hsl(var(--primary));
   }
 
   .hover-lift {
-    @apply transition-all duration-300 ease-out;
+    @apply transition-all duration-150 ease-out;
   }
   .hover-lift:hover {
-    @apply -translate-y-1 shadow-xl shadow-black/[0.06];
+    @apply bg-muted/50;
   }
 }
