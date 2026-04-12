@@ -1,6 +1,11 @@
 import { useParams, useNavigate } from "react-router-dom";
-import { ArrowLeft, MapPin, Users, Zap, Sun } from "lucide-react";
+import { ArrowLeft, MapPin, Users, Zap, Sun, TrendingUp, Leaf } from "lucide-react";
 import { useState } from "react";
+import { SolarDistribution } from "@/components/community/SolarDistribution";
+import { ParticipantsList } from "@/components/community/ParticipantsList";
+import { DocumentsTab } from "@/components/community/DocumentsTab";
+import { SignaturesTab } from "@/components/community/SignaturesTab";
+import { KpiCard } from "@/components/dashboard/KpiCard";
 
 const tabs = [
   { id: "overview", label: "Resumen" },
@@ -54,12 +59,12 @@ const CommunityDetail = () => {
 
       {/* Tabs */}
       <div className="border-b border-border/50">
-        <nav className="flex gap-1 -mb-px">
+        <nav className="flex gap-1 -mb-px overflow-x-auto">
           {tabs.map((tab) => (
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`px-4 py-2.5 text-sm font-medium transition-all duration-200 border-b-2 rounded-t-lg ${
+              className={`px-4 py-2.5 text-sm font-medium transition-all duration-200 border-b-2 rounded-t-lg whitespace-nowrap ${
                 activeTab === tab.id
                   ? "border-primary text-primary bg-primary/5"
                   : "border-transparent text-muted-foreground hover:text-foreground hover:border-border"
@@ -72,64 +77,61 @@ const CommunityDetail = () => {
       </div>
 
       {/* Tab content */}
-      <div className="animate-fade-in" key={activeTab}>
+      <div key={activeTab}>
         {activeTab === "overview" && (
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="glass-card rounded-2xl p-6 col-span-2">
-              <h3 className="font-heading font-semibold mb-3">Producción del día</h3>
-              <div className="h-48 flex items-center justify-center text-muted-foreground text-sm">
-                Gráfico de producción solar — Fase 2
-              </div>
+          <div className="space-y-6 animate-fade-in">
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+              <KpiCard icon={Zap} title="Producción hoy" value={185} suffix=" kWh" trend="+8%" delay={0} />
+              <KpiCard icon={Users} title="Vecinos activos" value={10} delay={100} />
+              <KpiCard icon={TrendingUp} title="Ahorro mensual" value={340} prefix="€" trend="+12%" delay={200} />
+              <KpiCard icon={Leaf} title="CO₂ evitado" value={420} suffix=" kg" delay={300} />
             </div>
-            <div className="glass-card rounded-2xl p-6">
-              <h3 className="font-heading font-semibold mb-3">Estado del reparto</h3>
-              <div className="flex flex-col items-center justify-center py-6">
-                <div className="relative w-28 h-28">
-                  <svg className="w-full h-full -rotate-90" viewBox="0 0 100 100">
-                    <circle cx="50" cy="50" r="42" fill="none" stroke="hsl(var(--muted))" strokeWidth="8" />
-                    <circle cx="50" cy="50" r="42" fill="none" stroke="url(#solar)" strokeWidth="8" strokeLinecap="round" strokeDasharray={`${mockCommunity.distributed * 2.64} 264`} />
-                    <defs>
-                      <linearGradient id="solar" x1="0%" y1="0%" x2="100%" y2="0%">
-                        <stop offset="0%" stopColor="hsl(var(--solar-emerald))" />
-                        <stop offset="100%" stopColor="hsl(var(--solar-gold))" />
-                      </linearGradient>
-                    </defs>
-                  </svg>
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <span className="text-2xl font-heading font-bold">{mockCommunity.distributed}%</span>
-                  </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="glass-card rounded-2xl p-6 col-span-2">
+                <h3 className="font-heading font-semibold mb-3">Producción solar del día</h3>
+                <div className="h-48 flex items-end gap-1 px-2">
+                  {/* Mini bar chart */}
+                  {[10, 25, 45, 70, 88, 95, 100, 92, 78, 55, 30, 12].map((h, i) => (
+                    <div key={i} className="flex-1 flex flex-col items-center gap-1">
+                      <div
+                        className="w-full rounded-t-md solar-gradient transition-all duration-500 ease-out"
+                        style={{ height: `${h * 1.8}px`, animationDelay: `${i * 60}ms` }}
+                      />
+                      <span className="text-[9px] text-muted-foreground">{6 + i}h</span>
+                    </div>
+                  ))}
                 </div>
-                <p className="text-sm text-muted-foreground mt-3">Energía repartida</p>
+              </div>
+
+              <div className="glass-card rounded-2xl p-6">
+                <h3 className="font-heading font-semibold mb-3">Estado del reparto</h3>
+                <div className="flex flex-col items-center justify-center py-4">
+                  <div className="relative w-28 h-28">
+                    <svg className="w-full h-full -rotate-90" viewBox="0 0 100 100">
+                      <circle cx="50" cy="50" r="42" fill="none" stroke="hsl(var(--muted))" strokeWidth="8" />
+                      <circle cx="50" cy="50" r="42" fill="none" stroke="url(#solar-detail)" strokeWidth="8" strokeLinecap="round" strokeDasharray={`${mockCommunity.distributed * 2.64} 264`} />
+                      <defs>
+                        <linearGradient id="solar-detail" x1="0%" y1="0%" x2="100%" y2="0%">
+                          <stop offset="0%" stopColor="hsl(var(--solar-emerald))" />
+                          <stop offset="100%" stopColor="hsl(var(--solar-gold))" />
+                        </linearGradient>
+                      </defs>
+                    </svg>
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <span className="text-2xl font-heading font-bold">{mockCommunity.distributed}%</span>
+                    </div>
+                  </div>
+                  <p className="text-sm text-muted-foreground mt-3">Energía repartida</p>
+                </div>
               </div>
             </div>
           </div>
         )}
-        {activeTab === "distribution" && (
-          <div className="glass-card rounded-2xl p-8 text-center">
-            <Sun className="w-12 h-12 text-solar-gold mx-auto mb-3 animate-pulse-solar" />
-            <h3 className="font-heading font-semibold text-lg mb-1">Reparto Solar</h3>
-            <p className="text-muted-foreground text-sm">Los sliders interactivos llegarán en la Fase 2</p>
-          </div>
-        )}
-        {activeTab === "participants" && (
-          <div className="glass-card rounded-2xl p-8 text-center">
-            <Users className="w-12 h-12 text-primary mx-auto mb-3" />
-            <h3 className="font-heading font-semibold text-lg mb-1">Participantes</h3>
-            <p className="text-muted-foreground text-sm">Gestión de vecinos — Fase 2</p>
-          </div>
-        )}
-        {activeTab === "documents" && (
-          <div className="glass-card rounded-2xl p-8 text-center">
-            <h3 className="font-heading font-semibold text-lg mb-1">Documentos</h3>
-            <p className="text-muted-foreground text-sm">Generación de ficheros — Fase 2</p>
-          </div>
-        )}
-        {activeTab === "signatures" && (
-          <div className="glass-card rounded-2xl p-8 text-center">
-            <h3 className="font-heading font-semibold text-lg mb-1">Firmas</h3>
-            <p className="text-muted-foreground text-sm">Firma digital de acuerdos — Fase 2</p>
-          </div>
-        )}
+        {activeTab === "distribution" && <SolarDistribution />}
+        {activeTab === "participants" && <ParticipantsList />}
+        {activeTab === "documents" && <DocumentsTab />}
+        {activeTab === "signatures" && <SignaturesTab />}
       </div>
     </div>
   );
