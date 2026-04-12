@@ -16,8 +16,8 @@ export function KpiCard({ title, value, suffix = "", prefix = "", icon: Icon, tr
 
   useEffect(() => {
     const timeout = setTimeout(() => {
-      const duration = 800;
-      const steps = 30;
+      const duration = 600;
+      const steps = 25;
       const increment = value / steps;
       let current = 0;
       const interval = setInterval(() => {
@@ -35,23 +35,19 @@ export function KpiCard({ title, value, suffix = "", prefix = "", icon: Icon, tr
   }, [value, delay]);
 
   return (
-    <div className="glass-card rounded-2xl p-5 hover-lift group">
-      <div className="flex items-start justify-between mb-3">
-        <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center group-hover:bg-primary/15 transition-colors">
-          <Icon className="w-5 h-5 text-primary" />
-        </div>
+    <div className="border border-border rounded-lg p-4 hover:bg-muted/40 transition-colors">
+      <div className="flex items-center gap-2 mb-3">
+        <Icon className="w-4 h-4 text-muted-foreground" />
+        <span className="text-xs text-muted-foreground">{title}</span>
         {trend && (
-          <span className="text-xs font-medium text-primary bg-primary/10 px-2 py-0.5 rounded-full">
+          <span className="text-[11px] font-medium text-primary ml-auto">
             {trend}
           </span>
         )}
       </div>
-      <div className="animate-count-up">
-        <p className="text-2xl font-heading font-bold text-foreground">
-          {prefix}{displayValue.toLocaleString("es-ES")}{suffix}
-        </p>
-        <p className="text-sm text-muted-foreground mt-0.5">{title}</p>
-      </div>
+      <p className="text-xl font-semibold text-foreground tabular-nums">
+        {prefix}{displayValue.toLocaleString("es-ES")}{suffix}
+      </p>
     </div>
   );
 }

@@ -1,4 +1,4 @@
-import { Home, Building2, BarChart3, Settings, Sun } from "lucide-react";
+import { Home, Building2, BarChart3, Settings, Zap } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { useLocation } from "react-router-dom";
 import {
@@ -10,6 +10,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarHeader,
+  SidebarFooter,
   useSidebar,
 } from "@/components/ui/sidebar";
 
@@ -26,14 +27,14 @@ export function AppSidebar() {
   const location = useLocation();
 
   return (
-    <Sidebar collapsible="icon" className="border-r-0">
-      <SidebarHeader className="p-4 pb-6">
-        <NavLink to="/" className="flex items-center gap-2.5 group">
-          <div className="w-9 h-9 rounded-xl solar-gradient flex items-center justify-center shadow-md shadow-primary/20 group-hover:shadow-lg group-hover:shadow-primary/30 transition-shadow">
-            <Sun className="w-5 h-5 text-white" />
+    <Sidebar collapsible="icon" className="border-r border-border">
+      <SidebarHeader className="px-3 py-4">
+        <NavLink to="/" className="flex items-center gap-2 group">
+          <div className="w-7 h-7 rounded-md bg-primary flex items-center justify-center">
+            <Zap className="w-3.5 h-3.5 text-primary-foreground" />
           </div>
           {!collapsed && (
-            <span className="font-heading font-bold text-xl tracking-tight text-foreground">
+            <span className="font-semibold text-sm text-foreground tracking-tight">
               Repartio
             </span>
           )}
@@ -54,13 +55,13 @@ export function AppSidebar() {
                       <NavLink
                         to={item.url}
                         end={item.url === "/"}
-                        className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 ${
+                        className={`flex items-center gap-2.5 px-2.5 py-1.5 rounded-md text-[13px] font-medium transition-colors ${
                           isActive
-                            ? "bg-primary/10 text-primary"
-                            : "text-muted-foreground hover:text-foreground hover:bg-muted/60"
+                            ? "bg-accent text-foreground"
+                            : "text-muted-foreground hover:text-foreground hover:bg-accent"
                         }`}
                       >
-                        <item.icon className={`w-[18px] h-[18px] ${isActive ? "text-primary" : ""}`} />
+                        <item.icon className="w-4 h-4" />
                         {!collapsed && <span>{item.title}</span>}
                       </NavLink>
                     </SidebarMenuButton>
