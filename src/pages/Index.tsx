@@ -2,6 +2,7 @@ import { Zap, Building2, Users, Leaf, TrendingUp, ArrowRight } from "lucide-reac
 import { SolarOrb } from "@/components/dashboard/SolarOrb";
 import { KpiCard } from "@/components/dashboard/KpiCard";
 import { CommunityCard } from "@/components/dashboard/CommunityCard";
+import { SolarProductionChart } from "@/components/charts/SolarProductionChart";
 import { useNavigate } from "react-router-dom";
 
 const getGreeting = () => {
@@ -40,47 +41,33 @@ const Index = () => {
 
       {/* KPI Bento Grid */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <KpiCard
-          icon={Zap}
-          title="Energía repartida"
-          value={12450}
-          suffix=" kWh"
-          trend="+12%"
-          delay={0}
-        />
-        <KpiCard
-          icon={Building2}
-          title="Comunidades activas"
-          value={3}
-          delay={100}
-        />
-        <KpiCard
-          icon={Users}
-          title="Vecinos conectados"
-          value={40}
-          trend="+5"
-          delay={200}
-        />
-        <KpiCard
-          icon={Leaf}
-          title="CO₂ evitado"
-          value={2840}
-          suffix=" kg"
-          trend="🌱"
-          delay={300}
-        />
+        <KpiCard icon={Zap} title="Energía repartida" value={12450} suffix=" kWh" trend="+12%" delay={0} />
+        <KpiCard icon={Building2} title="Comunidades activas" value={3} delay={100} />
+        <KpiCard icon={Users} title="Vecinos conectados" value={40} trend="+5" delay={200} />
+        <KpiCard icon={Leaf} title="CO₂ evitado" value={2840} suffix=" kg" trend="🌱" delay={300} />
       </div>
 
-      {/* Motivational card */}
-      <div className="glass-card rounded-2xl p-6 flex items-center gap-5 solar-gradient text-white">
-        <div className="w-14 h-14 rounded-2xl bg-white/20 backdrop-blur flex items-center justify-center flex-shrink-0">
-          <TrendingUp className="w-7 h-7" />
+      {/* Bento: Chart + Motivational */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+        <div className="lg:col-span-2">
+          <SolarProductionChart />
         </div>
-        <div className="flex-1">
-          <p className="font-heading font-semibold text-lg">¡Tu comunidad brilla! ✨</p>
-          <p className="text-white/80 text-sm mt-0.5">
-            Este mes has ahorrado un 18% más que el anterior. Sigue así.
-          </p>
+        <div className="glass-card rounded-2xl p-6 flex flex-col justify-between solar-gradient text-white">
+          <div>
+            <div className="w-12 h-12 rounded-xl bg-white/20 backdrop-blur flex items-center justify-center mb-4">
+              <TrendingUp className="w-6 h-6" />
+            </div>
+            <p className="font-heading font-semibold text-lg">¡Tu comunidad brilla! ✨</p>
+            <p className="text-white/80 text-sm mt-1">
+              Este mes has ahorrado un 18% más que el anterior. Sigue compartiendo el sol.
+            </p>
+          </div>
+          <div className="mt-6 pt-4 border-t border-white/20">
+            <div className="flex items-baseline gap-1">
+              <span className="text-3xl font-heading font-bold">€720</span>
+              <span className="text-white/70 text-sm">este mes</span>
+            </div>
+          </div>
         </div>
       </div>
 

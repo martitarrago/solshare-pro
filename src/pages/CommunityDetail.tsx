@@ -6,6 +6,7 @@ import { ParticipantsList } from "@/components/community/ParticipantsList";
 import { DocumentsTab } from "@/components/community/DocumentsTab";
 import { SignaturesTab } from "@/components/community/SignaturesTab";
 import { KpiCard } from "@/components/dashboard/KpiCard";
+import { SolarProductionChart } from "@/components/charts/SolarProductionChart";
 
 const tabs = [
   { id: "overview", label: "Resumen" },
@@ -88,20 +89,8 @@ const CommunityDetail = () => {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div className="glass-card rounded-2xl p-6 col-span-2">
-                <h3 className="font-heading font-semibold mb-3">Producción solar del día</h3>
-                <div className="h-48 flex items-end gap-1 px-2">
-                  {/* Mini bar chart */}
-                  {[10, 25, 45, 70, 88, 95, 100, 92, 78, 55, 30, 12].map((h, i) => (
-                    <div key={i} className="flex-1 flex flex-col items-center gap-1">
-                      <div
-                        className="w-full rounded-t-md solar-gradient transition-all duration-500 ease-out"
-                        style={{ height: `${h * 1.8}px`, animationDelay: `${i * 60}ms` }}
-                      />
-                      <span className="text-[9px] text-muted-foreground">{6 + i}h</span>
-                    </div>
-                  ))}
-                </div>
+              <div className="md:col-span-2">
+                <SolarProductionChart />
               </div>
 
               <div className="glass-card rounded-2xl p-6">

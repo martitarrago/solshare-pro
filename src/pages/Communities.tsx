@@ -1,6 +1,7 @@
 import { Plus, Sun, Search } from "lucide-react";
 import { CommunityCard } from "@/components/dashboard/CommunityCard";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 const mockCommunities = [
   { id: "1", name: "Residencial Aurora", address: "Av. del Sol 42, Madrid", participants: 12, power: 45, distributed: 100, status: "active" as const },
@@ -12,6 +13,7 @@ const mockCommunities = [
 
 const Communities = () => {
   const [search, setSearch] = useState("");
+  const navigate = useNavigate();
   const filtered = mockCommunities.filter(c =>
     c.name.toLowerCase().includes(search.toLowerCase()) ||
     c.address.toLowerCase().includes(search.toLowerCase())
@@ -24,7 +26,10 @@ const Communities = () => {
           <h1 className="text-2xl font-heading font-bold text-foreground">Comunidades</h1>
           <p className="text-muted-foreground text-sm mt-0.5">{mockCommunities.length} comunidades registradas</p>
         </div>
-        <button className="flex items-center gap-2 px-4 py-2.5 rounded-xl solar-gradient text-white font-medium text-sm hover:opacity-90 transition-opacity shadow-md shadow-primary/20">
+        <button
+          onClick={() => navigate("/communities/new")}
+          className="flex items-center gap-2 px-4 py-2.5 rounded-xl solar-gradient text-white font-medium text-sm hover:opacity-90 transition-opacity shadow-md shadow-primary/20"
+        >
           <Plus className="w-4 h-4" />
           Nueva comunidad
         </button>
@@ -51,7 +56,6 @@ const Communities = () => {
           ))}
         </div>
       ) : (
-        /* Empty state */
         <div className="flex flex-col items-center justify-center py-20 text-center">
           <div className="w-20 h-20 rounded-full bg-solar-sand flex items-center justify-center mb-4 animate-float">
             <Sun className="w-10 h-10 text-solar-gold" />
