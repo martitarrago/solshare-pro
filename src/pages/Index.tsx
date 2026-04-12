@@ -1,20 +1,11 @@
-import { Zap, Building2, Users, Leaf, TrendingUp, ArrowRight, FileText, ShieldCheck } from "lucide-react";
-import { SolarOrb } from "@/components/dashboard/SolarOrb";
+import { Zap, Building2, Users, Leaf, TrendingUp, ArrowRight, FileText, ShieldCheck, Plus } from "lucide-react";
 import { KpiCard } from "@/components/dashboard/KpiCard";
 import { CommunityCard } from "@/components/dashboard/CommunityCard";
 import { SolarProductionChart } from "@/components/charts/SolarProductionChart";
 import { useNavigate } from "react-router-dom";
 import { mockCommunities } from "@/lib/mock-data";
 
-const getGreeting = () => {
-  const hour = new Date().getHours();
-  if (hour < 12) return { text: "Buenos días", emoji: "☀️" };
-  if (hour < 20) return { text: "Buenas tardes", emoji: "🌤️" };
-  return { text: "Buenas noches", emoji: "🌙" };
-};
-
 const Index = () => {
-  const greeting = getGreeting();
   const navigate = useNavigate();
 
   const communities = mockCommunities.map(c => ({
@@ -29,68 +20,78 @@ const Index = () => {
   const totalParticipants = mockCommunities.reduce((s, c) => s + c.participants.filter(p => p.status !== "exited").length, 0);
 
   return (
-    <div className="max-w-7xl mx-auto space-y-6 animate-fade-in">
+    <div className="max-w-5xl mx-auto space-y-6 animate-fade-in">
+      {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-heading font-bold text-foreground">
-            {greeting.text} {greeting.emoji}
-          </h1>
-          <p className="text-muted-foreground text-xs mt-0.5">
-            Panel de gestión de autoconsumo colectivo
-          </p>
+          <h1 className="text-lg font-semibold text-foreground">Panel de control</h1>
+          <p className="text-muted-foreground text-xs mt-0.5">Gestión de autoconsumo colectivo</p>
         </div>
-        <div className="hidden md:block"><SolarOrb /></div>
+        <button
+          onClick={() => navigate("/communities/new")}
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-primary text-primary-foreground text-xs font-medium hover:bg-primary/90 transition-colors"
+        >
+          <Plus className="w-3.5 h-3.5" /> Nueva comunidad
+        </button>
       </div>
 
+      {/* KPIs */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
         <KpiCard icon={Zap} title="kW gestionados" value={totalKw} suffix=" kWp" trend="+12%" delay={0} />
-        <KpiCard icon={Building2} title="Comunidades activas" value={mockCommunities.filter(c => c.status === "active").length} delay={100} />
-        <KpiCard icon={Users} title="Participantes" value={totalParticipants} trend={`+${totalParticipants}`} delay={200} />
-        <KpiCard icon={Leaf} title="CO₂ evitado" value={2840} suffix=" kg" trend="🌱" delay={300} />
+        <KpiCard icon={Building2} title="Comunidades" value={mockCommunities.filter(c => c.status === "active").length} delay={80} />
+        <KpiCard icon={Users} title="Participantes" value={totalParticipants} delay={160} />
+        <KpiCard icon={Leaf} title="CO₂ evitado" value={2840} suffix=" kg" delay={240} />
       </div>
 
+      {/* Chart + Actions */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         <div className="lg:col-span-2"><SolarProductionChart /></div>
-        <div className="space-y-4">
+        <div className="space-y-3">
           {/* Quick actions */}
-          <div className="glass-card rounded-2xl p-5">
-            <h3 className="font-heading font-semibold text-sm mb-3">Acciones rápidas</h3>
-            <div className="space-y-2">
-              <button onClick={() => navigate("/communities/new")} className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl bg-secondary hover:bg-secondary/80 transition-colors text-left">
-                <div className="w-8 h-8 rounded-lg solar-gradient flex items-center justify-center"><Building2 className="w-4 h-4 text-white" /></div>
-                <div><p className="text-xs font-medium text-foreground">Nueva comunidad</p><p className="text-[10px] text-muted-foreground">Registrar instalación</p></div>
-              </button>
-              <button onClick={() => navigate("/communities/1")} className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl bg-secondary hover:bg-secondary/80 transition-colors text-left">
-                <div className="w-8 h-8 rounded-lg bg-accent/15 flex items-center justify-center"><FileText className="w-4 h-4 text-accent" /></div>
-                <div><p className="text-xs font-medium text-foreground">Generar fichero TXT</p><p className="text-[10px] text-muted-foreground">Fichero de reparto</p></div>
-              </button>
-              <button onClick={() => navigate("/communities/2")} className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl bg-secondary hover:bg-secondary/80 transition-colors text-left">
-                <div className="w-8 h-8 rounded-lg bg-primary/15 flex items-center justify-center"><ShieldCheck className="w-4 h-4 text-primary" /></div>
-                <div><p className="text-xs font-medium text-foreground">Gestor de Autoconsumo</p><p className="text-[10px] text-muted-foreground">RDL 7/2026</p></div>
-              </button>
+          <div className="border border-border rounded-lg p-4">
+            <h3 className="font-medium text-sm mb-3 text-foreground">Acciones rápidas</h3>
+            <div className="space-y-1">
+              {[
+                { icon: Building2, label: "Nueva comunidad", desc: "Registrar instalación", onClick: () => navigate("/communities/new") },
+                { icon: FileText, label: "Generar fichero TXT", desc: "Fichero de reparto", onClick: () => navigate("/communities/1") },
+                { icon: ShieldCheck, label: "Gestor de Autoconsumo", desc: "RDL 7/2026", onClick: () => navigate("/communities/2") },
+              ].map((action) => (
+                <button
+                  key={action.label}
+                  onClick={action.onClick}
+                  className="w-full flex items-center gap-3 px-2.5 py-2 rounded-md hover:bg-muted transition-colors text-left"
+                >
+                  <action.icon className="w-4 h-4 text-muted-foreground" />
+                  <div>
+                    <p className="text-xs font-medium text-foreground">{action.label}</p>
+                    <p className="text-[11px] text-muted-foreground">{action.desc}</p>
+                  </div>
+                </button>
+              ))}
             </div>
           </div>
 
-          {/* Savings card */}
-          <div className="glass-card rounded-2xl p-5 solar-gradient text-white">
-            <div className="w-10 h-10 rounded-xl bg-white/20 backdrop-blur flex items-center justify-center mb-3">
-              <TrendingUp className="w-5 h-5" />
+          {/* Savings summary */}
+          <div className="border border-border rounded-lg p-4">
+            <div className="flex items-center gap-2 mb-2">
+              <TrendingUp className="w-4 h-4 text-muted-foreground" />
+              <span className="text-xs text-muted-foreground">Ahorro total estimado</span>
             </div>
-            <p className="font-heading font-semibold text-sm">Ahorro total estimado</p>
-            <p className="text-2xl font-heading font-bold mt-1">€10.160</p>
-            <p className="text-white/70 text-[10px] mt-0.5">Acumulado 2026</p>
+            <p className="text-xl font-semibold text-foreground">€10.160</p>
+            <p className="text-[11px] text-muted-foreground mt-0.5">Acumulado 2026</p>
           </div>
         </div>
       </div>
 
+      {/* Communities */}
       <div>
         <div className="flex items-center justify-between mb-3">
-          <h2 className="text-sm font-heading font-semibold text-foreground">Comunidades</h2>
-          <button onClick={() => navigate("/communities")} className="flex items-center gap-1 text-xs font-medium text-primary hover:text-primary/80 transition-colors">
-            Ver todas <ArrowRight className="w-3.5 h-3.5" />
+          <h2 className="text-sm font-medium text-foreground">Comunidades</h2>
+          <button onClick={() => navigate("/communities")} className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors">
+            Ver todas <ArrowRight className="w-3 h-3" />
           </button>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
           {communities.map((c) => <CommunityCard key={c.id} {...c} />)}
         </div>
       </div>

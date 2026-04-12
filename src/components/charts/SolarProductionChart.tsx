@@ -20,9 +20,9 @@ const data = [
 const CustomTooltip = ({ active, payload, label }: any) => {
   if (active && payload?.length) {
     return (
-      <div className="glass-card rounded-lg px-3 py-2 text-xs">
-        <p className="font-semibold text-foreground">{label}</p>
-        <p className="text-primary">{payload[0].value} kWh</p>
+      <div className="bg-foreground text-background rounded-md px-2.5 py-1.5 text-xs shadow-lg">
+        <p className="font-medium">{label}</p>
+        <p className="text-background/70">{payload[0].value} kWh</p>
       </div>
     );
   }
@@ -31,33 +31,29 @@ const CustomTooltip = ({ active, payload, label }: any) => {
 
 export function SolarProductionChart() {
   return (
-    <div className="glass-card rounded-2xl p-6">
-      <h3 className="font-heading font-semibold mb-1 text-foreground">Producción solar hoy</h3>
+    <div className="border border-border rounded-lg p-5">
+      <h3 className="font-medium text-sm text-foreground">Producción solar hoy</h3>
       <p className="text-xs text-muted-foreground mb-4">Energía generada por hora (kWh)</p>
-      <div className="h-56">
+      <div className="h-52">
         <ResponsiveContainer width="100%" height="100%">
           <AreaChart data={data} margin={{ top: 5, right: 5, left: -20, bottom: 0 }}>
             <defs>
               <linearGradient id="solarGrad" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor="hsl(43, 96%, 61%)" stopOpacity={0.4} />
-                <stop offset="100%" stopColor="hsl(160, 84%, 45%)" stopOpacity={0.05} />
-              </linearGradient>
-              <linearGradient id="solarStroke" x1="0" y1="0" x2="1" y2="0">
-                <stop offset="0%" stopColor="hsl(160, 84%, 45%)" />
-                <stop offset="100%" stopColor="hsl(43, 96%, 61%)" />
+                <stop offset="0%" stopColor="hsl(245, 58%, 51%)" stopOpacity={0.15} />
+                <stop offset="100%" stopColor="hsl(245, 58%, 51%)" stopOpacity={0.02} />
               </linearGradient>
             </defs>
-            <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" strokeOpacity={0.5} />
+            <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
             <XAxis dataKey="hour" tick={{ fontSize: 11, fill: "hsl(var(--muted-foreground))" }} axisLine={false} tickLine={false} />
             <YAxis tick={{ fontSize: 11, fill: "hsl(var(--muted-foreground))" }} axisLine={false} tickLine={false} />
             <Tooltip content={<CustomTooltip />} />
             <Area
               type="monotone"
               dataKey="production"
-              stroke="url(#solarStroke)"
-              strokeWidth={2.5}
+              stroke="hsl(245, 58%, 51%)"
+              strokeWidth={1.5}
               fill="url(#solarGrad)"
-              animationDuration={1200}
+              animationDuration={800}
               animationEasing="ease-out"
             />
           </AreaChart>
