@@ -40,10 +40,19 @@ export function generateDistributorTXT(community: Community): TxtGenerationResul
       lines.push(`${p.cups};${p.beta.toFixed(6)}`);
     });
   } else {
-    const hours = Array.from({ length: 24 }, (_, i) => `H${String(i + 1).padStart(2, "0")}`);
-    lines.push(`CUPS;${hours.join(";")}`);
+    // Full 8760-hour variable mode
+    lines.push(`; Formato variable: CUPS;H0001;H0002;...;H8760`);
+    lines.push(`; Cada hora del año con su coeficiente β`);
+    lines.push(``);
+    
+    // Header row with all 8760 hours
+    const hourHeaders = Array.from({ length: 8760 }, (_, i) => `H${String(i + 1).padStart(4, "0")}`);
+    lines.push(`CUPS;${hourHeaders.join(";")}`);
+    
+    // Each participant with their hourly coefficients
     activeParticipants.forEach(p => {
-      const hourlyBetas = hours.map(() => p.beta.toFixed(6));
+      // For now, same beta for all hours (can be customized per hour later)
+      const hourlyBetas = Array.from({ length: 8760 }, () => p.beta.toFixed(6));
       lines.push(`${p.cups};${hourlyBetas.join(";")}`);
     });
   }
@@ -52,6 +61,7 @@ export function generateDistributorTXT(community: Community): TxtGenerationResul
   lines.push(`; Fin del fichero`);
   lines.push(`; Total participantes: ${activeParticipants.length}`);
   lines.push(`; Suma coeficientes: ${(totalBeta * 100).toFixed(4)}%`);
+  lines.push(`; Total horas: ${community.coeficientMode === "fixed" ? "N/A (fijo)" : "8760"}`);
 
   return {
     content: lines.join("\n"),

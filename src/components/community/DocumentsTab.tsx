@@ -1,5 +1,7 @@
 import { useState } from "react";
-import { FileText, Download, Eye, Clock, CheckCircle2, Loader2, Sparkles } from "lucide-react";
+import { FileText, Download, Eye, Clock, CheckCircle2, Loader2, Sparkles, Printer } from "lucide-react";
+import { Community } from "@/lib/types";
+import { generateAgreementHTML, downloadAgreementHTML, printAgreement } from "@/lib/agreement-generator";
 
 interface Document {
   id: string;
@@ -9,34 +11,54 @@ interface Document {
   status: "generated" | "sent" | "pending";
 }
 
-const mockDocuments: Document[] = [
-  { id: "1", name: "Acuerdo de reparto Q1 2026", type: "PDF", date: "2026-03-15", status: "sent" },
-  { id: "2", name: "Certificado de coeficientes", type: "PDF", date: "2026-02-20", status: "generated" },
-  { id: "3", name: "Informe de producción Feb", type: "XLSX", date: "2026-03-01", status: "sent" },
-];
-
 const statusConfig = {
   generated: { label: "Generado", icon: CheckCircle2, className: "text-primary bg-primary/15" },
   sent: { label: "Enviado", icon: CheckCircle2, className: "text-solar-sky bg-solar-sky/15" },
   pending: { label: "Pendiente", icon: Clock, className: "text-solar-gold bg-solar-gold/15" },
 };
 
-export function DocumentsTab() {
-  const [generating, setGenerating] = useState(false);
-  const [showConfetti, setShowConfetti] = useState(false);
+interface DocumentsTabProps {
+  community?: Community;
+}
 
-  const handleGenerate = () => {
+export function DocumentsTab({ community }: DocumentsTabProps) {
+  const [generating, setGenerating] = useState(false);
+  const [documents, setDocuments] = useState<Document[]>([
+    { id: "1", name: "Acuerdo de reparto Q1 2026", type: "HTML", date: "2026-03-15", status: "sent" },
+    { id: "2", name: "Certificado de coeficientes", type: "PDF", date: "2026-02-20", status: "generated" },
+  ]);
+  const [previewHtml, setPreviewHtml] = useState<string | null>(null);
+
+  const handleGenerateAgreement = () => {
+    if (!community) return;
     setGenerating(true);
     setTimeout(() => {
+      const newDoc: Document = {
+        id: Date.now().toString(),
+        name: `Acuerdo de reparto — ${new Date().toLocaleDateString("es-ES")}`,
+        type: "HTML",
+        date: new Date().toISOString().slice(0, 10),
+        status: "generated",
+      };
+      setDocuments(prev => [newDoc, ...prev]);
       setGenerating(false);
-      setShowConfetti(true);
-      setTimeout(() => setShowConfetti(false), 2500);
-    }, 2000);
+      downloadAgreementHTML(community);
+    }, 1500);
+  };
+
+  const handlePreview = () => {
+    if (!community) return;
+    setPreviewHtml(generateAgreementHTML(community));
+  };
+
+  const handlePrint = () => {
+    if (!community) return;
+    printAgreement(community);
   };
 
   return (
     <div className="space-y-6 animate-fade-in">
-      {/* Generate button */}
+      {/* Generate Acuerdo */}
       <div className="glass-card rounded-2xl p-6 flex flex-col sm:flex-row items-center gap-4 relative overflow-hidden">
         <div className="w-14 h-14 rounded-2xl solar-gradient flex items-center justify-center flex-shrink-0 shadow-lg shadow-primary/20">
           {generating ? (
@@ -47,51 +69,67 @@ export function DocumentsTab() {
         </div>
         <div className="flex-1 text-center sm:text-left">
           <h3 className="font-heading font-semibold text-foreground">
-            {generating ? "Generando documento..." : "Generar nuevo documento"}
+            {generating ? "Generando acuerdo..." : "Acuerdo de Reparto"}
           </h3>
           <p className="text-sm text-muted-foreground mt-0.5">
             {generating
-              ? "Preparando el fichero de reparto con los coeficientes actuales"
-              : "Crea el fichero de reparto oficial con los datos actuales de la comunidad"
+              ? "Preparando el documento con participantes y coeficientes β"
+              : "Genera el acuerdo oficial imprimible con tabla de participantes, coeficientes y datos de la comunidad"
             }
           </p>
         </div>
-        {!generating && (
-          <button
-            onClick={handleGenerate}
-            className="flex items-center gap-2 px-5 py-2.5 rounded-xl solar-gradient text-white font-medium text-sm hover:opacity-90 transition-opacity shadow-md shadow-primary/20 flex-shrink-0"
-          >
-            <Sparkles className="w-4 h-4" />
-            Generar
-          </button>
-        )}
-
-        {/* Solar confetti */}
-        {showConfetti && (
-          <div className="absolute inset-0 pointer-events-none">
-            {Array.from({ length: 12 }).map((_, i) => (
-              <div
-                key={i}
-                className="absolute w-1.5 h-1.5 rounded-full"
-                style={{
-                  background: i % 2 === 0 ? "hsl(43, 96%, 61%)" : "hsl(160, 84%, 45%)",
-                  top: `${10 + Math.random() * 80}%`,
-                  left: `${5 + Math.random() * 90}%`,
-                  animation: `float 2s ease-out ${i * 0.08}s forwards`,
-                  opacity: 0.7,
-                }}
-              />
-            ))}
+        {!generating && community && (
+          <div className="flex gap-2 flex-shrink-0">
+            <button
+              onClick={handlePreview}
+              className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-secondary text-secondary-foreground text-sm font-medium hover:bg-secondary/80 transition-colors"
+            >
+              <Eye className="w-4 h-4" />
+              Vista previa
+            </button>
+            <button
+              onClick={handlePrint}
+              className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-secondary text-secondary-foreground text-sm font-medium hover:bg-secondary/80 transition-colors"
+            >
+              <Printer className="w-4 h-4" />
+              Imprimir
+            </button>
+            <button
+              onClick={handleGenerateAgreement}
+              className="flex items-center gap-2 px-5 py-2.5 rounded-xl solar-gradient text-white font-medium text-sm hover:opacity-90 transition-opacity shadow-md shadow-primary/20"
+            >
+              <Sparkles className="w-4 h-4" />
+              Descargar
+            </button>
           </div>
         )}
       </div>
 
+      {/* Preview modal */}
+      {previewHtml && (
+        <div className="glass-card rounded-2xl overflow-hidden animate-scale-in">
+          <div className="flex items-center justify-between px-5 py-3 border-b border-border/50">
+            <span className="text-sm font-heading font-semibold text-foreground">Vista previa del Acuerdo</span>
+            <button onClick={() => setPreviewHtml(null)} className="text-xs text-muted-foreground hover:text-foreground">
+              Cerrar
+            </button>
+          </div>
+          <div className="p-4 bg-white max-h-[500px] overflow-auto">
+            <iframe
+              srcDoc={previewHtml}
+              className="w-full h-[460px] border-0"
+              title="Acuerdo preview"
+            />
+          </div>
+        </div>
+      )}
+
       {/* Document list */}
       <div className="space-y-2">
-        <h3 className="font-heading font-semibold text-sm text-muted-foreground uppercase tracking-wider mb-3">
+        <h3 className="font-heading font-semibold text-xs text-muted-foreground uppercase tracking-wider mb-3">
           Historial de documentos
         </h3>
-        {mockDocuments.map((doc, i) => {
+        {documents.map((doc, i) => {
           const status = statusConfig[doc.status];
           const StatusIcon = status.icon;
           return (
