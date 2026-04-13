@@ -1,5 +1,5 @@
 import { useParams, useNavigate } from "react-router-dom";
-import { ArrowLeft, MapPin, Users, Zap, Sun, TrendingUp, Leaf, ShieldCheck, FileText, Hash } from "lucide-react";
+import { ArrowLeft, MapPin, Users, Zap, Sun, TrendingUp, Leaf, ShieldCheck, FileText, Hash, AlertCircle, AlertTriangle, CheckCircle2 } from "lucide-react";
 import { useState, useMemo } from "react";
 import { BetaCoefficients } from "@/components/community/BetaCoefficients";
 import { ParticipantsListPro } from "@/components/community/ParticipantsListPro";
@@ -10,7 +10,7 @@ import { GestorPanel } from "@/components/community/GestorPanel";
 import { KpiCard } from "@/components/dashboard/KpiCard";
 import { SolarProductionChart } from "@/components/charts/SolarProductionChart";
 import { mockCommunities } from "@/lib/mock-data";
-import { Participant, CoeficientMode } from "@/lib/types";
+import { Participant, CoeficientMode, PROJECT_PHASES, validateProject } from "@/lib/types";
 
 const tabs = [
   { id: "overview", label: "Resumen", icon: Sun },
@@ -20,6 +20,16 @@ const tabs = [
   { id: "documents", label: "Documentos", icon: FileText },
   { id: "signatures", label: "Firmas", icon: FileText },
 ];
+
+const phaseColors: Record<string, string> = {
+  configuracion: "bg-muted-foreground/20 text-muted-foreground",
+  vecinos: "bg-blue-100 text-blue-700",
+  reparto: "bg-amber-100 text-amber-700",
+  firmas: "bg-orange-100 text-orange-700",
+  listo: "bg-emerald-100 text-emerald-700",
+  enviado: "bg-violet-100 text-violet-700",
+  activo: "bg-primary/15 text-primary",
+};
 
 const CommunityDetail = () => {
   const { id } = useParams();
@@ -47,6 +57,15 @@ const CommunityDetail = () => {
   const totalBeta = activeParticipants.reduce((s, p) => s + p.beta, 0);
   const betaValid = Math.abs(totalBeta - 1) < 0.001;
 
+  // Validation
+  const issues = useMemo(() => validateProject(community), [community]);
+  const errors = issues.filter(i => i.type === "error");
+  const warnings = issues.filter(i => i.type === "warning");
+
+  // Phase progress
+  const currentPhaseStep = PROJECT_PHASES.find(p => p.id === community.phase)?.step || 1;
+  const phaseLabel = PROJECT_PHASES.find(p => p.id === community.phase)?.label || "";
+
   return (
     <div className="max-w-7xl mx-auto space-y-5 animate-fade-in">
       {/* Back + Header */}
@@ -64,10 +83,8 @@ const CommunityDetail = () => {
                   <ShieldCheck className="w-3 h-3" /> Gestor activo
                 </span>
               )}
-              <span className={`text-[10px] font-medium px-2 py-0.5 rounded-full ${
-                community.status === "active" ? "bg-primary/15 text-primary" : "bg-accent/15 text-accent"
-              }`}>
-                {community.status === "active" ? "Activa" : "Pendiente"}
+              <span className={`text-[10px] font-medium px-2 py-0.5 rounded-full ${phaseColors[community.phase] || ""}`}>
+                {phaseLabel}
               </span>
             </div>
             <div className="flex flex-wrap items-center gap-3 mt-1.5 text-xs text-muted-foreground">
@@ -80,6 +97,51 @@ const CommunityDetail = () => {
           </div>
         </div>
       </div>
+
+      {/* Phase Progress Bar (7 steps) */}
+      <div className="border border-border rounded-lg p-4">
+        <div className="flex items-center gap-1">
+          {PROJECT_PHASES.map((p, i) => (
+            <div key={p.id} className="flex items-center flex-1">
+              <div className={`flex items-center gap-1.5 px-2 py-1.5 rounded-md text-[10px] font-medium w-full justify-center transition-all ${
+                p.step < currentPhaseStep ? "bg-primary text-primary-foreground" :
+                p.step === currentPhaseStep ? "bg-primary/15 text-primary border border-primary/30" :
+                "bg-muted text-muted-foreground"
+              }`}>
+                {p.step < currentPhaseStep ? <CheckCircle2 className="w-3 h-3" /> : <span>{p.step}</span>}
+                <span className="hidden lg:inline">{p.label}</span>
+              </div>
+              {i < PROJECT_PHASES.length - 1 && (
+                <div className={`w-2 h-0.5 flex-shrink-0 ${p.step < currentPhaseStep ? "bg-primary" : "bg-muted"}`} />
+              )}
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Validation Banner */}
+      {(errors.length > 0 || warnings.length > 0) && (
+        <div className="border border-border rounded-lg p-4 space-y-2">
+          {errors.map((e, i) => (
+            <div key={`e${i}`} className="flex items-start gap-2 text-xs">
+              <AlertCircle className="w-3.5 h-3.5 text-destructive flex-shrink-0 mt-0.5" />
+              <span className="text-destructive">{e.message}</span>
+              {e.action && (
+                <button className="ml-auto text-[10px] font-medium text-primary hover:underline whitespace-nowrap">{e.action}</button>
+              )}
+            </div>
+          ))}
+          {warnings.map((w, i) => (
+            <div key={`w${i}`} className="flex items-start gap-2 text-xs">
+              <AlertTriangle className="w-3.5 h-3.5 text-amber-500 flex-shrink-0 mt-0.5" />
+              <span className="text-amber-600">{w.message}</span>
+              {w.action && (
+                <button className="ml-auto text-[10px] font-medium text-primary hover:underline whitespace-nowrap">{w.action}</button>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
 
       {/* Tabs */}
       <div className="border-b border-border/50">
@@ -119,7 +181,6 @@ const CommunityDetail = () => {
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
               <div className="lg:col-span-2"><SolarProductionChart /></div>
               <div className="space-y-4">
-                {/* Beta status */}
                 <div className="glass-card rounded-2xl p-5">
                   <h3 className="font-heading font-semibold text-sm mb-3">Coeficientes β</h3>
                   <div className="flex items-center justify-between mb-2">
@@ -137,7 +198,6 @@ const CommunityDetail = () => {
                   </p>
                 </div>
 
-                {/* Gestor badge */}
                 <GestorPanel
                   enabled={gestorEnabled}
                   gestorName={gestorName}
