@@ -35,19 +35,19 @@ export function KpiCard({ title, value, suffix = "", prefix = "", icon: Icon, tr
   }, [value, delay]);
 
   return (
-    <div className="glass-card rounded-xl p-4 hover-lift">
-      <div className="flex items-center gap-2 mb-3">
-        <div className="w-7 h-7 rounded-lg solar-gradient flex items-center justify-center">
-          <Icon className="w-3.5 h-3.5 text-white" />
+    <div className="bg-card border border-border rounded-xl p-5 hover-lift">
+      <div className="flex items-center gap-2.5 mb-3">
+        <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
+          <Icon className="w-4 h-4 text-primary" />
         </div>
-        <span className="text-xs text-muted-foreground">{title}</span>
+        <span className="text-xs text-muted-foreground flex-1">{title}</span>
         {trend && (
-          <span className="text-[11px] font-medium text-primary ml-auto">
+          <span className="text-[11px] font-medium text-primary">
             {trend}
           </span>
         )}
       </div>
-      <p className="text-xl font-semibold text-foreground tabular-nums">
+      <p className="text-2xl font-bold text-foreground tabular-nums">
         {prefix}{displayValue.toLocaleString("es-ES")}{suffix}
       </p>
     </div>
