@@ -10,6 +10,7 @@ import CommunityDetail from "./pages/CommunityDetail";
 import SettingsPage from "./pages/SettingsPage";
 import NewCommunity from "./pages/NewCommunity";
 import NotFound from "./pages/NotFound";
+import { AIChatAssistant } from "./components/AIChatAssistant";
 
 const queryClient = new QueryClient();
 
@@ -29,6 +30,7 @@ const App = () => (
             <Route path="*" element={<NotFound />} />
           </Routes>
         </AppLayout>
+        <AIChatAssistant />
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>

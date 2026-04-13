@@ -227,8 +227,8 @@ const CommunityDetail = () => {
         )}
 
         {activeTab === "txt" && <TxtGeneratorTab community={community} />}
-        {activeTab === "documents" && <DocumentsTab />}
-        {activeTab === "signatures" && <SignaturesTab />}
+        {activeTab === "documents" && <DocumentsTab community={community} />}
+        {activeTab === "signatures" && <SignaturesTab community={community} />}
       </div>
     </div>
   );
