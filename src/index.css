@@ -4,57 +4,57 @@
 
 @layer base {
   :root {
-    --background: 0 0% 99%;
-    --foreground: 0 0% 9%;
+    --background: 40 20% 98%;
+    --foreground: 220 15% 12%;
 
-    --card: 0 0% 100%;
-    --card-foreground: 0 0% 9%;
+    --card: 40 15% 99%;
+    --card-foreground: 220 15% 12%;
 
-    --popover: 0 0% 100%;
-    --popover-foreground: 0 0% 9%;
+    --popover: 40 15% 99%;
+    --popover-foreground: 220 15% 12%;
 
-    --primary: 245 58% 51%;
-    --primary-foreground: 0 0% 100%;
+    --primary: 25 85% 48%;
+    --primary-foreground: 40 20% 98%;
 
-    --secondary: 0 0% 96%;
-    --secondary-foreground: 0 0% 9%;
+    --secondary: 40 12% 94%;
+    --secondary-foreground: 220 15% 12%;
 
-    --muted: 0 0% 96%;
-    --muted-foreground: 0 0% 45%;
+    --muted: 40 10% 94%;
+    --muted-foreground: 220 10% 45%;
 
-    --accent: 0 0% 96%;
-    --accent-foreground: 0 0% 9%;
+    --accent: 40 12% 94%;
+    --accent-foreground: 220 15% 12%;
 
     --destructive: 0 72% 51%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 0 0% 92%;
-    --input: 0 0% 92%;
-    --ring: 245 58% 51%;
+    --border: 40 10% 89%;
+    --input: 40 10% 89%;
+    --ring: 25 85% 48%;
 
     --radius: 0.5rem;
 
-    /* Solar custom tokens - muted for Linear style */
-    --solar-gold: 45 80% 52%;
-    --solar-warm: 35 60% 52%;
-    --solar-sky: 210 50% 50%;
-    --solar-emerald: 160 45% 42%;
-    --solar-leaf: 155 30% 42%;
-    --solar-sand: 0 0% 96%;
+    /* Solar custom tokens */
+    --solar-gold: 43 96% 52%;
+    --solar-warm: 32 80% 50%;
+    --solar-sky: 200 55% 48%;
+    --solar-emerald: 155 50% 40%;
+    --solar-leaf: 145 35% 40%;
+    --solar-sand: 40 15% 95%;
 
-    /* Glass - simplified */
-    --glass-bg: 0 0% 100% / 0.95;
-    --glass-border: 0 0% 92% / 0.8;
+    /* Glass */
+    --glass-bg: 40 15% 99% / 0.95;
+    --glass-border: 40 10% 89% / 0.8;
 
     /* Sidebar */
-    --sidebar-background: 0 0% 98%;
-    --sidebar-foreground: 0 0% 40%;
-    --sidebar-primary: 245 58% 51%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 0 0% 94%;
-    --sidebar-accent-foreground: 0 0% 9%;
-    --sidebar-border: 0 0% 92%;
-    --sidebar-ring: 245 58% 51%;
+    --sidebar-background: 220 15% 12%;
+    --sidebar-foreground: 40 10% 65%;
+    --sidebar-primary: 25 85% 48%;
+    --sidebar-primary-foreground: 40 20% 98%;
+    --sidebar-accent: 220 12% 18%;
+    --sidebar-accent-foreground: 40 15% 95%;
+    --sidebar-border: 220 12% 18%;
+    --sidebar-ring: 25 85% 48%;
   }
 }
 
