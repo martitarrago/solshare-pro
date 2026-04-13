@@ -2,14 +2,14 @@ import { Community, Participant, BetaHistoryEntry, ProjectPhase } from "./types"
 
 const mkParticipants = (subset?: number[]): Participant[] => {
   const all: Participant[] = [
-    { id: "p1", name: "María García López", cups: "ES0021000000000001AA1P", email: "maria@email.com", unit: "1ºA", beta: 0.15, potenciaContratada: 4.6, consumoAnual: 3200, status: "active", signatureState: "signed", entryDate: "2025-01-15" },
-    { id: "p2", name: "Juan López Martín", cups: "ES0021000000000002BB2P", email: "juan@email.com", unit: "1ºB", beta: 0.12, potenciaContratada: 3.45, consumoAnual: 2800, status: "active", signatureState: "signed", entryDate: "2025-01-15" },
-    { id: "p3", name: "Ana Martínez Ruiz", cups: "ES0021000000000003CC3P", email: "ana@email.com", unit: "2ºA", beta: 0.10, potenciaContratada: 3.45, consumoAnual: 2100, status: "active", signatureState: "signed", entryDate: "2025-01-15" },
-    { id: "p4", name: "Carlos Ruiz Sánchez", cups: "ES0021000000000004DD4P", email: "carlos@email.com", unit: "2ºB", beta: 0.18, potenciaContratada: 5.75, consumoAnual: 4500, status: "active", signatureState: "pending", entryDate: "2025-02-01" },
-    { id: "p5", name: "Laura Sánchez Díaz", cups: "ES0021000000000005EE5P", email: "laura@email.com", unit: "3ºA", beta: 0.08, potenciaContratada: 3.45, consumoAnual: 1900, status: "pending", signatureState: "pending", entryDate: "2026-03-01" },
-    { id: "p6", name: "Pedro Fernández Gil", cups: "ES0021000000000006FF6P", email: "pedro@email.com", unit: "3ºB", beta: 0.14, potenciaContratada: 4.6, consumoAnual: 3100, status: "active", signatureState: "signed", entryDate: "2025-01-15" },
-    { id: "p7", name: "Isabel Moreno Vega", cups: "ES0021000000000007GG7P", email: "isabel@email.com", unit: "4ºA", beta: 0.11, potenciaContratada: 3.45, consumoAnual: 2400, status: "active", signatureState: "rejected", entryDate: "2025-01-15" },
-    { id: "p8", name: "David Jiménez Roca", cups: "ES0021000000000008HH8P", email: "david@email.com", unit: "4ºB", beta: 0.12, potenciaContratada: 4.6, consumoAnual: 2900, status: "active", signatureState: "signed", entryDate: "2025-01-15" },
+    { id: "p1", name: "María García López", cups: "ES0021000000000001AAFP", email: "maria@email.com", unit: "1ºA", beta: 0.15, potenciaContratada: 4.6, consumoAnual: 3200, status: "active", signatureState: "signed", entryDate: "2025-01-15" },
+    { id: "p2", name: "Juan López Martín", cups: "ES0021000000000002BBFP", email: "juan@email.com", unit: "1ºB", beta: 0.12, potenciaContratada: 3.45, consumoAnual: 2800, status: "active", signatureState: "signed", entryDate: "2025-01-15" },
+    { id: "p3", name: "Ana Martínez Ruiz", cups: "ES0021000000000003CCFP", email: "ana@email.com", unit: "2ºA", beta: 0.10, potenciaContratada: 3.45, consumoAnual: 2100, status: "active", signatureState: "signed", entryDate: "2025-01-15" },
+    { id: "p4", name: "Carlos Ruiz Sánchez", cups: "ES0021000000000004DDFP", email: "carlos@email.com", unit: "2ºB", beta: 0.18, potenciaContratada: 5.75, consumoAnual: 4500, status: "active", signatureState: "pending", entryDate: "2025-02-01" },
+    { id: "p5", name: "Laura Sánchez Díaz", cups: "ES0021000000000005EEFP", email: "laura@email.com", unit: "3ºA", beta: 0.08, potenciaContratada: 3.45, consumoAnual: 1900, status: "pending", signatureState: "pending", entryDate: "2026-03-01" },
+    { id: "p6", name: "Pedro Fernández Gil", cups: "ES0021000000000006FFFP", email: "pedro@email.com", unit: "3ºB", beta: 0.14, potenciaContratada: 4.6, consumoAnual: 3100, status: "active", signatureState: "signed", entryDate: "2025-01-15" },
+    { id: "p7", name: "Isabel Moreno Vega", cups: "ES0021000000000007GGFP", email: "isabel@email.com", unit: "4ºA", beta: 0.11, potenciaContratada: 3.45, consumoAnual: 2400, status: "active", signatureState: "rejected", entryDate: "2025-01-15" },
+    { id: "p8", name: "David Jiménez Roca", cups: "ES0021000000000008HHFP", email: "david@email.com", unit: "4ºB", beta: 0.12, potenciaContratada: 4.6, consumoAnual: 2900, status: "active", signatureState: "signed", entryDate: "2025-01-15" },
   ];
   return subset ? subset.map(i => all[i]) : all;
 };
