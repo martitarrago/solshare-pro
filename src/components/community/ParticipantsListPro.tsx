@@ -54,6 +54,7 @@ export function ParticipantsListPro({ participants, onParticipantsChange }: Part
       beta: 0,
       potenciaContratada: parseFloat(newPotencia) || undefined,
       status: "pending",
+      signatureState: "pending",
       entryDate: new Date().toISOString().slice(0, 10),
     };
 

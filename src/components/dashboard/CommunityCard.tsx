@@ -1,5 +1,6 @@
-import { Building2, Users, Zap, ShieldCheck } from "lucide-react";
+import { Building2, Users, Zap, ShieldCheck, AlertTriangle, CheckCircle2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { ProjectPhase, PROJECT_PHASES } from "@/lib/types";
 
 interface CommunityCardProps {
   id: string;
@@ -8,21 +9,28 @@ interface CommunityCardProps {
   participants: number;
   power: number;
   distributed: number;
-  status: "active" | "pending" | "inactive";
+  phase: ProjectPhase;
   gestorEnabled?: boolean;
   distribuidora?: string;
   cau?: string;
+  issues?: number;
+  documentProgress?: { done: number; total: number };
 }
 
-const statusConfig = {
-  active: { label: "Activa", dotColor: "bg-emerald-500" },
-  pending: { label: "Pendiente", dotColor: "bg-amber-400" },
-  inactive: { label: "Inactiva", dotColor: "bg-muted-foreground/40" },
+const phaseConfig: Record<ProjectPhase, { label: string; color: string }> = {
+  configuracion: { label: "Configuración", color: "bg-muted-foreground/20 text-muted-foreground" },
+  vecinos: { label: "Vecinos", color: "bg-blue-100 text-blue-700" },
+  reparto: { label: "Reparto", color: "bg-amber-100 text-amber-700" },
+  firmas: { label: "Firmas", color: "bg-orange-100 text-orange-700" },
+  listo: { label: "Listo", color: "bg-emerald-100 text-emerald-700" },
+  enviado: { label: "Enviado", color: "bg-violet-100 text-violet-700" },
+  activo: { label: "Activo", color: "bg-primary/15 text-primary" },
 };
 
-export function CommunityCard({ id, name, address, participants, power, distributed, status, gestorEnabled, distribuidora, cau }: CommunityCardProps) {
+export function CommunityCard({ id, name, address, participants, power, distributed, phase, gestorEnabled, distribuidora, cau, issues, documentProgress }: CommunityCardProps) {
   const navigate = useNavigate();
-  const statusInfo = statusConfig[status];
+  const phaseInfo = phaseConfig[phase];
+  const phaseStep = PROJECT_PHASES.find(p => p.id === phase)?.step || 1;
 
   return (
     <button
@@ -33,12 +41,18 @@ export function CommunityCard({ id, name, address, participants, power, distribu
         <h3 className="text-sm font-medium text-foreground group-hover:text-primary transition-colors">
           {name}
         </h3>
-        <div className="flex items-center gap-1.5">
-          {gestorEnabled && <ShieldCheck className="w-3.5 h-3.5 text-primary" />}
-          <span className={`w-1.5 h-1.5 rounded-full ${statusInfo.dotColor}`} />
-          <span className="text-[11px] text-muted-foreground">{statusInfo.label}</span>
-        </div>
+        <span className={`text-[10px] font-medium px-2 py-0.5 rounded-full ${phaseInfo.color}`}>
+          {phaseInfo.label}
+        </span>
       </div>
+
+      {/* Issue banner */}
+      {issues && issues > 0 && (
+        <div className="flex items-center gap-1.5 text-[10px] text-amber-600 bg-amber-50 px-2 py-1 rounded mb-2">
+          <AlertTriangle className="w-3 h-3" />
+          {issues} incidencia{issues > 1 ? "s" : ""}
+        </div>
+      )}
 
       <p className="text-xs text-muted-foreground mb-3 line-clamp-1">{address}</p>
 
@@ -60,13 +74,20 @@ export function CommunityCard({ id, name, address, participants, power, distribu
       <div className="flex items-center gap-4 text-xs text-muted-foreground">
         <div className="flex items-center gap-1"><Users className="w-3.5 h-3.5" />{participants}</div>
         <div className="flex items-center gap-1"><Zap className="w-3.5 h-3.5" />{power} kWp</div>
+        {gestorEnabled && <ShieldCheck className="w-3.5 h-3.5 text-primary" />}
         <div className="ml-auto text-[11px] tabular-nums font-medium text-foreground">{distributed}%</div>
       </div>
 
-      <div className="mt-2">
-        <div className="h-1 bg-muted rounded-full overflow-hidden">
-          <div className="h-full rounded-full bg-primary transition-all duration-500" style={{ width: `${distributed}%` }} />
-        </div>
+      {/* Step checklist progress */}
+      <div className="mt-2 flex gap-0.5">
+        {PROJECT_PHASES.map((p) => (
+          <div
+            key={p.id}
+            className={`h-1 flex-1 rounded-full transition-all ${
+              p.step <= phaseStep ? "bg-primary" : "bg-muted"
+            }`}
+          />
+        ))}
       </div>
     </button>
   );
