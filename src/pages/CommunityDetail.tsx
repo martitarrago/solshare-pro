@@ -94,25 +94,46 @@ const CommunityDetail = () => {
       </div>
 
       {/* Phase Progress */}
-      <div className="bg-card border border-border rounded-xl p-4">
-        <div className="flex items-center gap-1">
-          {PROJECT_PHASES.map((p, i) => (
-            <div key={p.id} className="flex items-center flex-1">
-              <div className={`flex items-center gap-1.5 px-2.5 py-2 rounded-lg text-[10px] font-medium w-full justify-center transition-all ${
-                p.step < currentPhaseStep ? "bg-primary text-primary-foreground" :
-                p.step === currentPhaseStep ? "bg-primary/10 text-primary ring-1 ring-primary/20" :
-                "bg-muted text-muted-foreground"
-              }`}>
-                {p.step < currentPhaseStep ? <CheckCircle2 className="w-3 h-3" /> : <span className="text-[9px]">{p.step}</span>}
-                <span className="hidden lg:inline">{p.label}</span>
+      {(() => {
+        const currentPhase = PROJECT_PHASES.find(p => p.id === community.phase);
+        return (
+          <div className="bg-card border border-border rounded-xl p-5 space-y-4">
+            {/* Current phase — prominent */}
+            <div className="flex items-center gap-3">
+              <div className="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center">
+                <span className="text-sm font-bold text-primary">{currentPhase?.step}</span>
               </div>
-              {i < PROJECT_PHASES.length - 1 && (
-                <div className={`w-2 h-0.5 flex-shrink-0 ${p.step < currentPhaseStep ? "bg-primary" : "bg-muted"}`} />
-              )}
+              <div>
+                <p className="text-base font-bold text-foreground">{currentPhase?.label}</p>
+                <p className="text-xs text-muted-foreground">{currentPhase?.desc}</p>
+              </div>
             </div>
-          ))}
-        </div>
-      </div>
+
+            {/* Mini step bar */}
+            <div className="flex items-center gap-1">
+              {PROJECT_PHASES.map((p, i) => {
+                const isDone = p.step < currentPhaseStep;
+                const isCurrent = p.step === currentPhaseStep;
+                return (
+                  <div key={p.id} className="flex items-center flex-1">
+                    <div className={`flex items-center gap-1 px-1.5 py-1 rounded text-[9px] font-medium w-full justify-center transition-all ${
+                      isDone ? "bg-primary text-primary-foreground" :
+                      isCurrent ? "bg-primary/10 text-primary ring-1 ring-primary/20" :
+                      "bg-muted text-muted-foreground"
+                    }`}>
+                      {isDone ? <CheckCircle2 className="w-2.5 h-2.5" /> : <span>{p.step}</span>}
+                      <span className="hidden xl:inline">{p.label}</span>
+                    </div>
+                    {i < PROJECT_PHASES.length - 1 && (
+                      <div className={`w-1.5 h-0.5 flex-shrink-0 ${isDone ? "bg-primary" : "bg-muted"}`} />
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        );
+      })()}
 
       {/* Validation Banner */}
       {!dismissedBanner && (errors.length > 0 || warnings.length > 0) && (
