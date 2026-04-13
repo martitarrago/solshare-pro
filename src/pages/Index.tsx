@@ -260,9 +260,7 @@ const Index = () => {
               placeholder={placeholder + "▏"}
               className="flex-1 bg-transparent text-sm outline-none placeholder:text-muted-foreground/60 text-foreground"
               onFocus={() => {
-                // Open the floating chat assistant
-                const chatBtn = document.querySelector<HTMLButtonElement>('[data-chat-toggle]');
-                chatBtn?.click();
+                window.dispatchEvent(new CustomEvent("open-ai-chat"));
               }}
               readOnly
             />
