@@ -95,8 +95,8 @@ const CommunityDetail = () => {
     const documento: StepStatus = community.documents.txt ? "complete" : "pending";
 
     // Firmas: complete if all signed, error if any rejected, pending otherwise
-    const allSigned = activeParticipants.length > 0 && activeParticipants.every(p => p.signed);
-    const anyRejected = activeParticipants.some(p => (p as any).signatureRejected);
+    const allSigned = activeParticipants.length > 0 && activeParticipants.every(p => p.signatureState === "signed");
+    const anyRejected = activeParticipants.some(p => p.signatureState === "rejected");
     const firmas: StepStatus = anyRejected ? "error" : (allSigned ? "complete" : "pending");
 
     return { detalles, participantes, coeficientes, documento, firmas };
@@ -347,10 +347,7 @@ const CommunityDetail = () => {
 
         {/* STEP: Firmas */}
         {activeStep === "firmas" && (
-          <SignaturesTab
-            participants={participants}
-            onParticipantsChange={setParticipants}
-          />
+          <SignaturesTab community={community as any} />
         )}
       </div>
     </div>
