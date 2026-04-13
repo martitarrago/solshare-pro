@@ -13,7 +13,7 @@ import { mockCommunities } from "@/lib/mock-data";
 import { Participant, CoeficientMode, PROJECT_PHASES, validateProject } from "@/lib/types";
 
 const tabs = [
-  { id: "overview", label: "Resumen", icon: Sun },
+  { id: "overview", label: "Resumen", icon: Zap },
   { id: "coefficients", label: "Coeficientes β", icon: Hash },
   { id: "participants", label: "Participantes", icon: Users },
   { id: "txt", label: "Fichero TXT", icon: FileText },
