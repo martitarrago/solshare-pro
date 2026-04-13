@@ -13,8 +13,8 @@ interface Document {
 
 const statusConfig = {
   generated: { label: "Generado", icon: CheckCircle2, className: "text-primary bg-primary/15" },
-  sent: { label: "Enviado", icon: CheckCircle2, className: "text-solar-sky bg-solar-sky/15" },
-  pending: { label: "Pendiente", icon: Clock, className: "text-solar-gold bg-solar-gold/15" },
+  sent: { label: "Enviado", icon: CheckCircle2, className: "text-accent bg-accent/15" },
+  pending: { label: "Pendiente", icon: Clock, className: "text-accent bg-accent/15" },
 };
 
 interface DocumentsTabProps {
@@ -60,7 +60,7 @@ export function DocumentsTab({ community }: DocumentsTabProps) {
     <div className="space-y-6 animate-fade-in">
       {/* Generate Acuerdo */}
       <div className="glass-card rounded-2xl p-6 flex flex-col sm:flex-row items-center gap-4 relative overflow-hidden">
-        <div className="w-14 h-14 rounded-2xl solar-gradient flex items-center justify-center flex-shrink-0 shadow-lg shadow-primary/20">
+        <div className="w-14 h-14 rounded-2xl mint-gradient flex items-center justify-center flex-shrink-0 shadow-lg shadow-primary/20">
           {generating ? (
             <Loader2 className="w-7 h-7 text-white animate-spin" />
           ) : (
@@ -96,7 +96,7 @@ export function DocumentsTab({ community }: DocumentsTabProps) {
             </button>
             <button
               onClick={handleGenerateAgreement}
-              className="flex items-center gap-2 px-5 py-2.5 rounded-xl solar-gradient text-white font-medium text-sm hover:opacity-90 transition-opacity shadow-md shadow-primary/20"
+              className="flex items-center gap-2 px-5 py-2.5 rounded-xl mint-gradient text-white font-medium text-sm hover:opacity-90 transition-opacity shadow-md shadow-primary/20"
             >
               <Sparkles className="w-4 h-4" />
               Descargar

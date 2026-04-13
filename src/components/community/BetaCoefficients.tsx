@@ -113,7 +113,7 @@ export function BetaCoefficients({ participants, mode, onModeChange, onParticipa
 
         <button
           onClick={() => setShowSuggestionPanel(!showSuggestionPanel)}
-          className="flex items-center gap-2 px-4 py-2 rounded-xl solar-gradient text-white font-medium text-sm hover:opacity-90 transition-opacity shadow-md shadow-primary/20"
+          className="flex items-center gap-2 px-4 py-2 rounded-xl mint-gradient text-white font-medium text-sm hover:opacity-90 transition-opacity shadow-md shadow-primary/20"
         >
           <Calculator className="w-4 h-4" />
           Calculadora β
@@ -176,7 +176,7 @@ export function BetaCoefficients({ participants, mode, onModeChange, onParticipa
         <div className="h-2.5 bg-muted rounded-full overflow-hidden">
           <div
             className={`h-full rounded-full transition-all duration-500 ease-out ${
-              isComplete ? "solar-gradient" : isOver ? "bg-destructive" : "bg-accent/70"
+              isComplete ? "mint-gradient" : isOver ? "bg-destructive" : "bg-accent/70"
             }`}
             style={{ width: `${Math.min(totalPercent, 100)}%` }}
           />

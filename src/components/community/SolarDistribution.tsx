@@ -75,7 +75,7 @@ export function SolarDistribution() {
       <div className="flex flex-wrap items-center gap-3">
         <button
           onClick={suggestFairDistribution}
-          className="flex items-center gap-2 px-4 py-2.5 rounded-xl solar-gradient text-white font-medium text-sm hover:opacity-90 transition-opacity shadow-md shadow-primary/20"
+          className="flex items-center gap-2 px-4 py-2.5 rounded-xl mint-gradient text-white font-medium text-sm hover:opacity-90 transition-opacity shadow-md shadow-primary/20"
         >
           <Sparkles className="w-4 h-4" />
           Sugerir reparto justo
@@ -183,7 +183,7 @@ export function SolarDistribution() {
             <div className="h-2 bg-muted rounded-full overflow-hidden">
               <div
                 className={`h-full rounded-full transition-all duration-500 ease-out ${
-                  isComplete ? "solar-gradient" : total > 100 ? "bg-destructive" : "bg-primary/60"
+                  isComplete ? "mint-gradient" : total > 100 ? "bg-destructive" : "bg-primary/60"
                 }`}
                 style={{ width: `${Math.min(total, 100)}%` }}
               />

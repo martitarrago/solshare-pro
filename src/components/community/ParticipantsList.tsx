@@ -11,7 +11,7 @@ interface Participant {
 }
 
 const AVATAR_COLORS = [
-  "bg-primary", "bg-solar-gold", "bg-solar-sky",
+  "bg-primary", "bg-accent", "bg-accent",
   "bg-purple-500", "bg-pink-500", "bg-orange-500",
   "bg-teal-500", "bg-indigo-500",
 ];
@@ -29,8 +29,8 @@ const initialParticipants: Participant[] = [
 
 const statusLabels = {
   active: { label: "Activo", className: "bg-primary/15 text-primary" },
-  pending: { label: "Pendiente", className: "bg-solar-gold/15 text-solar-gold" },
-  invited: { label: "Invitado", className: "bg-solar-sky/15 text-solar-sky" },
+  pending: { label: "Pendiente", className: "bg-accent/15 text-accent" },
+  invited: { label: "Invitado", className: "bg-accent/15 text-accent" },
 };
 
 export function ParticipantsList() {
@@ -59,7 +59,7 @@ export function ParticipantsList() {
         </div>
         <button
           onClick={() => setShowAddForm(!showAddForm)}
-          className="flex items-center gap-2 px-4 py-2.5 rounded-xl solar-gradient text-white font-medium text-sm hover:opacity-90 transition-opacity shadow-md shadow-primary/20"
+          className="flex items-center gap-2 px-4 py-2.5 rounded-xl mint-gradient text-white font-medium text-sm hover:opacity-90 transition-opacity shadow-md shadow-primary/20"
         >
           {showAddForm ? <X className="w-4 h-4" /> : <Plus className="w-4 h-4" />}
           {showAddForm ? "Cancelar" : "Añadir vecino"}

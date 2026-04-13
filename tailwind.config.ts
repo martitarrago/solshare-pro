@@ -61,15 +61,7 @@ export default {
           border: "hsl(var(--sidebar-border))",
           ring: "hsl(var(--sidebar-ring))",
         },
-        solar: {
-          gold: "hsl(var(--solar-gold))",
-          warm: "hsl(var(--solar-warm))",
-          sky: "hsl(var(--solar-sky))",
-          emerald: "hsl(var(--solar-emerald))",
-          leaf: "hsl(var(--solar-leaf))",
-          sand: "hsl(var(--solar-sand))",
-          lime: "hsl(var(--solar-lime))",
-        },
+        mint: "hsl(var(--mint))",
       },
       borderRadius: {
         lg: "var(--radius)",

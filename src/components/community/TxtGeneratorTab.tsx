@@ -74,7 +74,7 @@ export function TxtGeneratorTab({ community }: TxtGeneratorTabProps) {
           <button
             onClick={handleGenerate}
             disabled={!isValid || generating}
-            className="flex items-center gap-2 px-5 py-2.5 rounded-xl solar-gradient text-white font-medium text-sm hover:opacity-90 transition-opacity shadow-md shadow-primary/20 disabled:opacity-40 disabled:cursor-not-allowed flex-shrink-0"
+            className="flex items-center gap-2 px-5 py-2.5 rounded-xl mint-gradient text-white font-medium text-sm hover:opacity-90 transition-opacity shadow-md shadow-primary/20 disabled:opacity-40 disabled:cursor-not-allowed flex-shrink-0"
           >
             {generating ? (
               <Loader2 className="w-4 h-4 animate-spin" />
