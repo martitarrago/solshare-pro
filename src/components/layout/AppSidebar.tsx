@@ -25,14 +25,14 @@ export function AppSidebar() {
   const location = useLocation();
 
   return (
-    <Sidebar collapsible="icon" className="border-r border-border">
+    <Sidebar collapsible="icon" className="border-r-0">
       <SidebarHeader className="px-3 py-4">
         <NavLink to="/" className="flex items-center gap-2 group">
-          <div className="w-7 h-7 rounded-md bg-primary flex items-center justify-center">
-            <Zap className="w-3.5 h-3.5 text-primary-foreground" />
+          <div className="w-7 h-7 rounded-lg solar-gradient flex items-center justify-center shadow-sm glow-gold">
+            <Zap className="w-3.5 h-3.5 text-sidebar-primary-foreground" />
           </div>
           {!collapsed && (
-            <span className="font-semibold text-sm text-foreground tracking-tight">
+            <span className="font-bold text-sm text-sidebar-accent-foreground tracking-tight">
               Repartio
             </span>
           )}
