@@ -186,20 +186,6 @@ const NewCommunityWizard = () => {
               <label className="text-[10px] text-muted-foreground mb-1.5 block uppercase tracking-wider font-semibold">Potencia (kWp) *</label>
               <input type="number" placeholder="Ej. 45" value={power} onChange={(e) => setPower(e.target.value)} className={inputClass} />
             </div>
-            <div className="grid grid-cols-2 gap-3">
-              <div>
-                <label className="text-[10px] text-muted-foreground mb-1.5 block uppercase tracking-wider font-semibold">Tipo de conexión</label>
-                <select value={connectionType} onChange={(e) => setConnectionType(e.target.value as ConnectionType)} className={inputClass}>
-                  {CONNECTION_TYPES.map(ct => <option key={ct.id} value={ct.id}>{ct.label}</option>)}
-                </select>
-              </div>
-              <div>
-                <label className="text-[10px] text-muted-foreground mb-1.5 block uppercase tracking-wider font-semibold">Proximidad</label>
-                <select value={proximity} onChange={(e) => setProximity(e.target.value as ProximityCriteria)} className={inputClass}>
-                  {PROXIMITY_CRITERIA.map(pc => <option key={pc.id} value={pc.id}>{pc.label}</option>)}
-                </select>
-              </div>
-            </div>
           </div>
         )}
 
