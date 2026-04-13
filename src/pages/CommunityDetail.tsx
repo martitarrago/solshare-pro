@@ -1,10 +1,11 @@
 import { useParams, useNavigate } from "react-router-dom";
-import { MapPin, Users, Zap, FileText, AlertCircle, AlertTriangle, CheckCircle2, X, Building2, Hash, Circle } from "lucide-react";
+import { MapPin, Users, Zap, FileText, AlertCircle, AlertTriangle, CheckCircle2, X, Building2, Hash, Circle, PenLine } from "lucide-react";
 import { useState, useMemo } from "react";
 import { BetaCoefficients } from "@/components/community/BetaCoefficients";
 import { ParticipantsListPro } from "@/components/community/ParticipantsListPro";
 import { DocumentsTab } from "@/components/community/DocumentsTab";
 import { TxtGeneratorTab } from "@/components/community/TxtGeneratorTab";
+import { SignaturesTab } from "@/components/community/SignaturesTab";
 import { GestorPanel } from "@/components/community/GestorPanel";
 import { mockCommunities } from "@/lib/mock-data";
 import {
@@ -19,13 +20,14 @@ const STEPS = [
   { id: "participantes", label: "Participantes", icon: Users },
   { id: "coeficientes", label: "Coeficientes", icon: Hash },
   { id: "documento", label: "Documento", icon: FileText },
+  { id: "firmas", label: "Firmas", icon: PenLine },
 ] as const;
 
 type StepId = (typeof STEPS)[number]["id"];
 type StepStatus = "complete" | "error" | "pending";
 
 function deriveProjectStatus(community: { name: string; cau: string; createdAt: string; documents: { txt: boolean } }, stepsAllComplete: boolean): { label: string; className: string } {
-  if (community.documents.txt && stepsAllComplete) return { label: "Validado", className: "bg-primary/10 text-primary" };
+  if (stepsAllComplete) return { label: "Validado", className: "bg-primary/10 text-primary" };
   return { label: "Borrador", className: "bg-muted text-muted-foreground" };
 }
 
@@ -92,7 +94,12 @@ const CommunityDetail = () => {
     // Documento: complete if txt generated
     const documento: StepStatus = community.documents.txt ? "complete" : "pending";
 
-    return { detalles, participantes, coeficientes, documento };
+    // Firmas: complete if all signed, error if any rejected, pending otherwise
+    const allSigned = activeParticipants.length > 0 && activeParticipants.every(p => p.signatureState === "signed");
+    const anyRejected = activeParticipants.some(p => p.signatureState === "rejected");
+    const firmas: StepStatus = anyRejected ? "error" : (allSigned ? "complete" : "pending");
+
+    return { detalles, participantes, coeficientes, documento, firmas };
   }, [name, cau, community, activeParticipants, betaValid]);
 
   const allComplete = Object.values(stepStatuses).every(s => s === "complete");
@@ -336,6 +343,11 @@ const CommunityDetail = () => {
               <DocumentsTab community={community} />
             </div>
           </div>
+        )}
+
+        {/* STEP: Firmas */}
+        {activeStep === "firmas" && (
+          <SignaturesTab community={community as any} />
         )}
       </div>
     </div>
