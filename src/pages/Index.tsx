@@ -3,10 +3,10 @@ import { useNavigate } from "react-router-dom";
 import ReactMarkdown from "react-markdown";
 import {
   AlertCircle, FileCheck, Send, Zap, ChevronRight,
-  Sparkles, Clock, ArrowRight, Plus, ExternalLink, Loader2, X,
+  Sparkles, Clock, ArrowRight, Plus, ExternalLink, Loader2, X, CheckCircle2,
 } from "lucide-react";
 
-// ── Mock data matching the user's spec ──────────────────────────────────────
+// ── Mock data ───────────────────────────────────────────────────────────────
 
 interface MockCommunity {
   id: number;
@@ -44,11 +44,11 @@ const ultimosMovimientos: MockMovimiento[] = [
 
 type PipelineState = "faltan_datos" | "pendiente_firma" | "listo_para_enviar" | "activado";
 
-const PIPELINE: { id: PipelineState; label: string; icon: typeof AlertCircle; color: string; glowColor: string; bgActive: string }[] = [
-  { id: "faltan_datos", label: "Faltan datos", icon: AlertCircle, color: "text-amber-500", glowColor: "shadow-amber-400/50", bgActive: "bg-amber-500" },
-  { id: "pendiente_firma", label: "Pendiente de firma", icon: FileCheck, color: "text-sky-500", glowColor: "shadow-sky-400/50", bgActive: "bg-sky-500" },
-  { id: "listo_para_enviar", label: "Listo para enviar", icon: Send, color: "text-emerald-500", glowColor: "shadow-emerald-400/50", bgActive: "bg-emerald-500" },
-  { id: "activado", label: "Activado", icon: Zap, color: "text-primary", glowColor: "shadow-primary/50", bgActive: "bg-primary" },
+const PIPELINE: { id: PipelineState; label: string; icon: typeof AlertCircle; badgeClass: string }[] = [
+  { id: "faltan_datos", label: "Faltan datos", icon: AlertCircle, badgeClass: "badge-warning" },
+  { id: "pendiente_firma", label: "Pendiente firma", icon: FileCheck, badgeClass: "badge-info" },
+  { id: "listo_para_enviar", label: "Listo para enviar", icon: Send, badgeClass: "badge-success" },
+  { id: "activado", label: "Activado", icon: Zap, badgeClass: "badge-active" },
 ];
 
 // ── Typewriter hook ─────────────────────────────────────────────────────────
@@ -200,159 +200,38 @@ const Index = () => {
     return map;
   }, []);
 
-  // Default expanded: first state with communities
   const defaultExpanded = useMemo(() => {
     return PIPELINE.find(p => grouped[p.id].length > 0)?.id ?? "faltan_datos";
   }, [grouped]);
 
   const [activeState, setActiveState] = useState<PipelineState>(defaultExpanded);
 
-  const handleNodeClick = useCallback((id: PipelineState) => {
-    setActiveState(prev => prev === id ? id : id);
-  }, []);
-
   return (
-    <div className="max-w-5xl mx-auto space-y-8 animate-fade-in pb-6">
+    <div className="max-w-5xl mx-auto space-y-6 animate-fade-in pb-6">
       {/* 1. Welcome */}
-      <div className="space-y-1">
-        <h1 className="text-2xl font-bold solar-gradient-text">Panel de Control</h1>
-        <p className="text-sm text-muted-foreground">
-          Aquí tienes el resumen del estado de todas tus comunidades
+      <div>
+        <h1 className="text-2xl font-bold text-foreground">Panel de Control</h1>
+        <p className="text-sm text-muted-foreground mt-0.5">
+          Resumen del estado de todas tus comunidades
         </p>
       </div>
 
-      {/* 2. Pipeline — Electric Circuit */}
-      <div className="relative">
-        <div className="grid grid-cols-4 gap-0 relative">
-          {/* Connecting cable line */}
-          <div className="absolute top-[3.25rem] left-[12.5%] right-[12.5%] h-1 z-0">
-            <div className="w-full h-full rounded-full bg-border relative overflow-hidden">
-              {/* Animated energy flow */}
-              <div className="absolute inset-0 bg-gradient-to-r from-amber-400 via-emerald-400 to-primary animate-pulse opacity-40 rounded-full" />
-            </div>
-          </div>
-
-          {PIPELINE.map((state, i) => {
-            const count = grouped[state.id].length;
-            const isActive = activeState === state.id;
-            const hasItems = count > 0;
-            const Icon = state.icon;
-
-            return (
-              <button
-                key={state.id}
-                onClick={() => handleNodeClick(state.id)}
-                className="relative z-10 flex flex-col items-center group cursor-pointer"
-              >
-                {/* Node — the "circuit nodo" */}
-                <div className={`
-                  relative w-[6.5rem] h-[6.5rem] rounded-2xl border-2 transition-all duration-300
-                  flex flex-col items-center justify-center gap-1
-                  ${isActive
-                    ? `border-current ${state.color} bg-card shadow-lg ${state.glowColor} scale-105`
-                    : hasItems
-                      ? `border-border bg-card hover:border-current hover:${state.color} hover:shadow-md`
-                      : "border-border/50 bg-muted/30 opacity-60"
-                  }
-                `}>
-                  {/* Glow ring for active */}
-                  {isActive && (
-                    <div className={`absolute -inset-1 rounded-2xl ${state.bgActive} opacity-10 blur-md animate-pulse`} />
-                  )}
-
-                  {/* Energy bolt indicator */}
-                  {hasItems && (
-                    <div className={`absolute -top-2 -right-2 w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold text-white ${state.bgActive} shadow-md`}>
-                      {count}
-                    </div>
-                  )}
-
-                  <Icon className={`w-6 h-6 relative z-10 ${isActive ? state.color : hasItems ? "text-muted-foreground group-hover:" + state.color : "text-muted-foreground/50"}`} />
-                  <span className={`text-[10px] font-medium text-center leading-tight px-1 relative z-10 ${isActive ? "text-foreground" : "text-muted-foreground"}`}>
-                    {state.label}
-                  </span>
-                </div>
-
-              </button>
-            );
-          })}
-        </div>
-      </div>
-
-      {/* 3. Expanded community list for active state */}
-      <div className="border border-border rounded-xl overflow-hidden bg-card/50 backdrop-blur-sm">
-        <div className="px-4 py-3 border-b border-border flex items-center gap-2">
-          {(() => {
-            const state = PIPELINE.find(p => p.id === activeState)!;
-            const Icon = state.icon;
-            return (
-              <>
-                <Icon className={`w-4 h-4 ${state.color}`} />
-                <span className="text-sm font-semibold text-foreground">{state.label}</span>
-                <span className="text-xs text-muted-foreground ml-1">
-                  — {grouped[activeState].length} comunidad{grouped[activeState].length !== 1 ? "es" : ""}
-                </span>
-              </>
-            );
-          })()}
-        </div>
-
-        {grouped[activeState].length === 0 ? (
-          <div className="px-4 py-8 text-center">
-            <p className="text-sm text-muted-foreground">No hay comunidades en este estado</p>
-          </div>
-        ) : (
-          <div className="divide-y divide-border">
-            {grouped[activeState].map((com) => (
-              <CommunityRow key={com.id} community={com} onNavigate={() => navigate(`/communities/${com.id}`)} />
-            ))}
-          </div>
-        )}
-      </div>
-
-      {/* 4. Activity feed */}
+      {/* 2. AI Chat — top placement */}
       <div className="space-y-3">
-        <h2 className="text-sm font-semibold text-foreground flex items-center gap-2">
-          <Clock className="w-4 h-4 text-muted-foreground" />
-          Últimos movimientos
-        </h2>
-        <div className="relative border-l-2 border-border ml-2 space-y-0">
-          {ultimosMovimientos.map((mov, i) => (
-            <div key={i} className="relative pl-6 pb-5 last:pb-0 group">
-              {/* Timeline dot */}
-              <div className="absolute left-[-5px] top-1.5 w-2 h-2 rounded-full bg-primary ring-2 ring-background" />
-              <p className="text-sm text-foreground">
-                <span className="font-semibold">{mov.comunidad}</span>
-                <span className="text-muted-foreground">: {mov.accion}</span>
-              </p>
-              <p className="text-xs text-muted-foreground mt-0.5">{mov.fecha}</p>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* 5. Inline AI Chat */}
-      <div className="space-y-3">
-        <p className="text-xs text-muted-foreground flex items-center gap-1.5">
-          <Sparkles className="w-3.5 h-3.5 text-primary" />
-          Pregunta lo que necesites sobre tus comunidades al asistente de IA
-        </p>
-
-        {/* Chat messages area */}
         {chatOpen && chatMessages.length > 0 && (
-          <div className="border border-border rounded-xl bg-card/50 backdrop-blur-sm overflow-hidden">
-            <div className="flex items-center justify-between px-4 py-2 border-b border-border">
+          <div className="border border-border rounded-xl bg-card overflow-hidden">
+            <div className="flex items-center justify-between px-4 py-2.5 border-b border-border">
               <span className="text-xs font-medium text-muted-foreground flex items-center gap-1.5">
-                <Sparkles className="w-3 h-3 text-primary" /> Asistente IA
+                <Sparkles className="w-3.5 h-3.5 text-primary" /> Asistente IA
               </span>
-              <button onClick={() => { setChatOpen(false); setChatMessages([]); }} className="p-1 rounded hover:bg-muted/50 transition-colors">
+              <button onClick={() => { setChatOpen(false); setChatMessages([]); }} className="p-1 rounded hover:bg-muted transition-colors">
                 <X className="w-3.5 h-3.5 text-muted-foreground" />
               </button>
             </div>
-            <div className="max-h-80 overflow-y-auto px-4 py-3 space-y-3">
+            <div className="max-h-72 overflow-y-auto px-4 py-3 space-y-3">
               {chatMessages.map((m, i) => (
                 <div key={i} className={`flex gap-2 ${m.role === "user" ? "justify-end" : "justify-start"}`}>
-                  <div className={`max-w-[85%] text-sm leading-relaxed px-3 py-2 rounded-xl ${
+                  <div className={`max-w-[85%] text-sm leading-relaxed px-3.5 py-2.5 rounded-xl ${
                     m.role === "user"
                       ? "bg-primary text-primary-foreground rounded-br-sm"
                       : "bg-muted text-foreground rounded-bl-sm"
@@ -367,7 +246,7 @@ const Index = () => {
               ))}
               {chatLoading && chatMessages[chatMessages.length - 1]?.role !== "assistant" && (
                 <div className="flex gap-2">
-                  <div className="bg-muted text-foreground text-sm px-3 py-2 rounded-xl rounded-bl-sm">
+                  <div className="bg-muted text-foreground text-sm px-3.5 py-2.5 rounded-xl rounded-bl-sm">
                     <Loader2 className="w-4 h-4 animate-spin" />
                   </div>
                 </div>
@@ -377,18 +256,17 @@ const Index = () => {
           </div>
         )}
 
-        {/* Input bar */}
         <form
           onSubmit={(e) => { e.preventDefault(); sendChat(chatInput); }}
-          className="relative flex items-center gap-3 bg-card/95 backdrop-blur-xl border border-border rounded-2xl px-4 py-3 shadow-xl shadow-primary/5"
+          className="relative flex items-center gap-3 bg-card border border-border rounded-xl px-4 py-3 shadow-sm"
         >
-          <Sparkles className="w-5 h-5 text-primary flex-shrink-0" />
+          <Sparkles className="w-4 h-4 text-primary flex-shrink-0" />
           <input
             type="text"
             value={chatInput}
             onChange={(e) => setChatInput(e.target.value)}
             placeholder={chatInput ? "" : placeholder + "▏"}
-            className="flex-1 bg-transparent text-sm outline-none placeholder:text-muted-foreground/60 text-foreground"
+            className="flex-1 bg-transparent text-sm outline-none placeholder:text-muted-foreground/50 text-foreground"
             disabled={chatLoading}
           />
           <button
@@ -400,11 +278,101 @@ const Index = () => {
           </button>
         </form>
       </div>
+
+      {/* 3. Pipeline — Horizontal Stepper */}
+      <div className="bg-card border border-border rounded-xl p-4">
+        <div className="grid grid-cols-4 gap-2">
+          {PIPELINE.map((state, i) => {
+            const count = grouped[state.id].length;
+            const isActive = activeState === state.id;
+            const Icon = state.icon;
+
+            return (
+              <button
+                key={state.id}
+                onClick={() => setActiveState(state.id)}
+                className={`relative flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-left transition-all ${
+                  isActive
+                    ? "bg-muted ring-1 ring-primary/20"
+                    : "hover:bg-muted/50"
+                }`}
+              >
+                <div className={`w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 ${state.badgeClass}`}>
+                  <Icon className="w-4 h-4" />
+                </div>
+                <div className="min-w-0 flex-1">
+                  <p className={`text-xs font-medium truncate ${isActive ? "text-foreground" : "text-muted-foreground"}`}>
+                    {state.label}
+                  </p>
+                  <p className="text-lg font-bold text-foreground leading-none mt-0.5">{count}</p>
+                </div>
+                {isActive && (
+                  <div className="absolute bottom-0 left-3 right-3 h-0.5 bg-primary rounded-full" />
+                )}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* 4. Community list for active state */}
+      <div className="border border-border rounded-xl overflow-hidden bg-card">
+        <div className="px-4 py-3 border-b border-border flex items-center gap-2">
+          {(() => {
+            const state = PIPELINE.find(p => p.id === activeState)!;
+            const Icon = state.icon;
+            return (
+              <>
+                <div className={`w-5 h-5 rounded flex items-center justify-center ${state.badgeClass}`}>
+                  <Icon className="w-3 h-3" />
+                </div>
+                <span className="text-sm font-semibold text-foreground">{state.label}</span>
+                <span className="text-xs text-muted-foreground">
+                  — {grouped[activeState].length} comunidad{grouped[activeState].length !== 1 ? "es" : ""}
+                </span>
+              </>
+            );
+          })()}
+        </div>
+
+        {grouped[activeState].length === 0 ? (
+          <div className="px-4 py-12 text-center">
+            <CheckCircle2 className="w-8 h-8 text-muted-foreground/30 mx-auto mb-2" />
+            <p className="text-sm text-muted-foreground">No hay comunidades en este estado</p>
+          </div>
+        ) : (
+          <div className="divide-y divide-border">
+            {grouped[activeState].map((com) => (
+              <CommunityRow key={com.id} community={com} onNavigate={() => navigate(`/communities/${com.id}`)} />
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* 5. Activity feed */}
+      <div className="space-y-3">
+        <h2 className="text-sm font-semibold text-foreground flex items-center gap-2">
+          <Clock className="w-4 h-4 text-muted-foreground" />
+          Últimos movimientos
+        </h2>
+        <div className="relative border-l-2 border-border ml-2 space-y-0">
+          {ultimosMovimientos.map((mov, i) => (
+            <div key={i} className="relative pl-6 pb-4 last:pb-0">
+              <div className="absolute left-[-5px] top-1.5 w-2 h-2 rounded-full bg-primary/60 ring-2 ring-background" />
+              <p className="text-[13px] text-foreground">
+                <span className="font-medium">{mov.comunidad}</span>
+                <span className="text-muted-foreground"> — {mov.accion}</span>
+              </p>
+              <p className="text-[11px] text-muted-foreground mt-0.5">{mov.fecha}</p>
+            </div>
+          ))}
+        </div>
+      </div>
     </div>
   );
 };
 
-// ── Community Row subcomponent ──────────────────────────────────────────────
+// ── Community Row ───────────────────────────────────────────────────────────
 
 function CommunityRow({ community: com, onNavigate }: { community: MockCommunity; onNavigate: () => void }) {
   const [expanded, setExpanded] = useState(false);
@@ -419,58 +387,55 @@ function CommunityRow({ community: com, onNavigate }: { community: MockCommunity
         <span className="text-sm font-medium text-foreground flex-1">{com.nombre}</span>
 
         {com.estado === "faltan_datos" && (
-          <span className="text-[10px] px-2 py-0.5 rounded-full bg-amber-100 text-amber-700 font-medium">
+          <span className="text-[10px] px-2 py-0.5 rounded-full badge-warning font-medium">
             {com.errores.length} error{com.errores.length !== 1 ? "es" : ""}
           </span>
         )}
         {com.estado === "pendiente_firma" && (
-          <span className="text-[10px] px-2 py-0.5 rounded-full bg-sky-100 text-sky-700 font-medium">
+          <span className="text-[10px] px-2 py-0.5 rounded-full badge-info font-medium">
             {com.firmasPendientes || com.errores[0]}
           </span>
         )}
         {com.estado === "listo_para_enviar" && (
-          <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700 font-medium">
+          <span className="text-[10px] px-2 py-0.5 rounded-full badge-success font-medium">
             Todo listo
           </span>
         )}
         {com.estado === "activado" && com.fechaActivacion && (
-          <span className="text-[10px] px-2 py-0.5 rounded-full bg-primary/10 text-primary font-medium">
+          <span className="text-[10px] px-2 py-0.5 rounded-full badge-active font-medium">
             Activa desde {new Date(com.fechaActivacion).toLocaleDateString("es-ES")}
           </span>
         )}
       </button>
 
-      {/* Expanded details */}
       <div className={`overflow-hidden transition-all duration-300 ${expanded ? "max-h-96 opacity-100" : "max-h-0 opacity-0"}`}>
         <div className="px-4 pb-4 pl-11 space-y-2">
           {com.estado === "faltan_datos" && com.errores.map((err, i) => (
             <div key={i} className="flex items-start gap-2 text-xs">
-              <AlertCircle className="w-3.5 h-3.5 text-amber-500 mt-0.5 flex-shrink-0" />
+              <AlertCircle className="w-3.5 h-3.5 text-destructive/70 mt-0.5 flex-shrink-0" />
               <span className="text-muted-foreground">{err}</span>
             </div>
           ))}
 
           {com.estado === "pendiente_firma" && (
             <div className="flex items-start gap-2 text-xs">
-              <FileCheck className="w-3.5 h-3.5 text-sky-500 mt-0.5 flex-shrink-0" />
+              <FileCheck className="w-3.5 h-3.5 text-primary mt-0.5 flex-shrink-0" />
               <span className="text-muted-foreground">{com.firmasPendientes || com.errores[0]}</span>
             </div>
           )}
 
           {com.estado === "listo_para_enviar" && (
-            <div className="flex items-center gap-2">
-              <button
-                onClick={(e) => { e.stopPropagation(); onNavigate(); }}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg solar-gradient text-white text-xs font-medium hover:opacity-90 transition-opacity"
-              >
-                <Send className="w-3 h-3" /> Enviar a distribuidora
-              </button>
-            </div>
+            <button
+              onClick={(e) => { e.stopPropagation(); onNavigate(); }}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-primary text-primary-foreground text-xs font-medium hover:bg-primary/90 transition-colors"
+            >
+              <Send className="w-3 h-3" /> Enviar a distribuidora
+            </button>
           )}
 
           {com.estado === "activado" && (
             <p className="text-xs text-muted-foreground">
-              ✅ Comunidad activa y funcionando desde {com.fechaActivacion ? new Date(com.fechaActivacion).toLocaleDateString("es-ES", { day: "numeric", month: "long", year: "numeric" }) : "—"}
+              ✅ Comunidad activa desde {com.fechaActivacion ? new Date(com.fechaActivacion).toLocaleDateString("es-ES", { day: "numeric", month: "long", year: "numeric" }) : "—"}
             </p>
           )}
 

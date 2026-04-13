@@ -1,7 +1,6 @@
-import { Plus, Search, ArrowUpDown } from "lucide-react";
+import { Search, ArrowUpDown, Building2 } from "lucide-react";
 import { CommunityCard } from "@/components/dashboard/CommunityCard";
 import { useState, useMemo } from "react";
-import { useNavigate } from "react-router-dom";
 import { mockCommunities } from "@/lib/mock-data";
 import { validateProject, ProjectPhase } from "@/lib/types";
 
@@ -22,7 +21,6 @@ const Communities = () => {
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState<Filter>("todos");
   const [sortBy, setSortBy] = useState<SortBy>("phase");
-  const navigate = useNavigate();
 
   const communitiesData = useMemo(() =>
     mockCommunities.map(c => {
@@ -70,39 +68,31 @@ const Communities = () => {
   }, [communitiesData, search, filter, sortBy]);
 
   return (
-    <div className="max-w-5xl mx-auto space-y-5 animate-fade-in">
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-        <div>
-          <h1 className="text-lg font-semibold text-foreground">Comunidades</h1>
-          <p className="text-muted-foreground text-xs mt-0.5">{communitiesData.length} instalaciones de autoconsumo</p>
-        </div>
-        <button
-          onClick={() => navigate("/communities/new")}
-          className="flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-primary text-primary-foreground text-xs font-medium hover:bg-primary/90 transition-colors"
-        >
-          <Plus className="w-3.5 h-3.5" /> Nueva comunidad
-        </button>
+    <div className="max-w-5xl mx-auto space-y-6 animate-fade-in">
+      <div>
+        <h1 className="text-xl font-bold text-foreground">Comunidades</h1>
+        <p className="text-muted-foreground text-sm mt-0.5">{communitiesData.length} instalaciones de autoconsumo</p>
       </div>
 
       {/* Search + Filters + Sort */}
       <div className="space-y-3">
         <div className="flex gap-3 items-center">
           <div className="relative flex-1 max-w-sm">
-            <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
             <input
               type="text"
               placeholder="Buscar por nombre, dirección o CAU..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full pl-8 pr-3 py-1.5 rounded-md border border-border bg-background text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring transition-all"
+              className="w-full pl-9 pr-3 py-2 rounded-lg border border-border bg-card text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring transition-all"
             />
           </div>
-          <div className="flex items-center gap-1 text-xs text-muted-foreground">
+          <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
             <ArrowUpDown className="w-3.5 h-3.5" />
             <select
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value as SortBy)}
-              className="bg-background border border-border rounded-md px-2 py-1 text-xs text-foreground focus:outline-none"
+              className="bg-card border border-border rounded-lg px-2.5 py-2 text-xs text-foreground focus:outline-none"
             >
               <option value="phase">Por fase</option>
               <option value="issues">Por incidencias</option>
@@ -111,13 +101,12 @@ const Communities = () => {
           </div>
         </div>
 
-        {/* Filter tabs */}
-        <div className="flex gap-1">
+        <div className="flex gap-1.5">
           {FILTERS.map(f => (
             <button
               key={f.id}
               onClick={() => setFilter(f.id)}
-              className={`px-3 py-1 rounded-md text-xs font-medium transition-colors ${
+              className={`px-3.5 py-1.5 rounded-lg text-xs font-medium transition-colors ${
                 filter === f.id
                   ? "bg-primary text-primary-foreground"
                   : "bg-muted text-muted-foreground hover:text-foreground"
@@ -130,7 +119,7 @@ const Communities = () => {
       </div>
 
       {filtered.length > 0 ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {filtered.map((community, i) => (
             <div key={community.id} className="animate-fade-in" style={{ animationDelay: `${i * 40}ms` }}>
               <CommunityCard {...community} />
@@ -138,8 +127,9 @@ const Communities = () => {
           ))}
         </div>
       ) : (
-        <div className="flex flex-col items-center justify-center py-16 text-center">
-          <h3 className="font-medium text-foreground text-sm mb-1">
+        <div className="flex flex-col items-center justify-center py-20 text-center">
+          <Building2 className="w-10 h-10 text-muted-foreground/30 mb-3" />
+          <h3 className="font-semibold text-foreground text-sm mb-1">
             {search || filter !== "todos" ? "Sin resultados" : "Crea tu primera comunidad"}
           </h3>
           <p className="text-muted-foreground text-xs max-w-sm">

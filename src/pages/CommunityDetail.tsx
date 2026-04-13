@@ -1,5 +1,5 @@
 import { useParams, useNavigate } from "react-router-dom";
-import { ArrowLeft, MapPin, Users, Zap, TrendingUp, Leaf, ShieldCheck, FileText, Hash, AlertCircle, AlertTriangle, CheckCircle2 } from "lucide-react";
+import { MapPin, Users, Zap, TrendingUp, Leaf, ShieldCheck, FileText, Hash, AlertCircle, AlertTriangle, CheckCircle2, X } from "lucide-react";
 import { useState, useMemo } from "react";
 import { BetaCoefficients } from "@/components/community/BetaCoefficients";
 import { ParticipantsListPro } from "@/components/community/ParticipantsListPro";
@@ -8,7 +8,6 @@ import { SignaturesTab } from "@/components/community/SignaturesTab";
 import { TxtGeneratorTab } from "@/components/community/TxtGeneratorTab";
 import { GestorPanel } from "@/components/community/GestorPanel";
 import { KpiCard } from "@/components/dashboard/KpiCard";
-import { SolarProductionChart } from "@/components/charts/SolarProductionChart";
 import { mockCommunities } from "@/lib/mock-data";
 import { Participant, CoeficientMode, PROJECT_PHASES, validateProject } from "@/lib/types";
 
@@ -20,16 +19,6 @@ const tabs = [
   { id: "documents", label: "Documentos", icon: FileText },
   { id: "signatures", label: "Firmas", icon: FileText },
 ];
-
-const phaseColors: Record<string, string> = {
-  configuracion: "bg-muted-foreground/20 text-muted-foreground",
-  vecinos: "bg-blue-100 text-blue-700",
-  reparto: "bg-amber-100 text-amber-700",
-  firmas: "bg-orange-100 text-orange-700",
-  listo: "bg-emerald-100 text-emerald-700",
-  enviado: "bg-violet-100 text-violet-700",
-  activo: "bg-primary/15 text-primary",
-};
 
 const CommunityDetail = () => {
   const { id } = useParams();
@@ -57,58 +46,53 @@ const CommunityDetail = () => {
   const totalBeta = activeParticipants.reduce((s, p) => s + p.beta, 0);
   const betaValid = Math.abs(totalBeta - 1) < 0.001;
 
-  // Validation
   const issues = useMemo(() => validateProject(community), [community]);
   const errors = issues.filter(i => i.type === "error");
   const warnings = issues.filter(i => i.type === "warning");
+  const [dismissedBanner, setDismissedBanner] = useState(false);
 
-  // Phase progress
   const currentPhaseStep = PROJECT_PHASES.find(p => p.id === community.phase)?.step || 1;
   const phaseLabel = PROJECT_PHASES.find(p => p.id === community.phase)?.label || "";
 
   return (
-    <div className="max-w-7xl mx-auto space-y-5 animate-fade-in">
-      {/* Back + Header */}
+    <div className="max-w-7xl mx-auto space-y-6 animate-fade-in">
+      {/* Header */}
       <div>
-        <button onClick={() => navigate("/communities")} className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors mb-3">
-          <ArrowLeft className="w-3.5 h-3.5" /> Comunidades
-        </button>
-
         <div className="flex items-start justify-between">
           <div>
-            <div className="flex items-center gap-2">
-              <h1 className="text-xl font-heading font-bold text-foreground">{community.name}</h1>
+            <div className="flex items-center gap-2.5">
+              <h1 className="text-xl font-bold text-foreground">{community.name}</h1>
               {gestorEnabled && (
-                <span className="flex items-center gap-1 text-[10px] font-medium px-2 py-0.5 rounded-full bg-primary/15 text-primary">
+                <span className="flex items-center gap-1 text-[10px] font-medium px-2 py-0.5 rounded-full badge-active">
                   <ShieldCheck className="w-3 h-3" /> Gestor activo
                 </span>
               )}
-              <span className={`text-[10px] font-medium px-2 py-0.5 rounded-full ${phaseColors[community.phase] || ""}`}>
+              <span className={`text-[10px] font-medium px-2 py-0.5 rounded-full badge-info`}>
                 {phaseLabel}
               </span>
             </div>
-            <div className="flex flex-wrap items-center gap-3 mt-1.5 text-xs text-muted-foreground">
+            <div className="flex flex-wrap items-center gap-3 mt-2 text-xs text-muted-foreground">
               <span className="flex items-center gap-1"><MapPin className="w-3 h-3" />{community.address}, {community.city}</span>
               <span className="flex items-center gap-1"><Users className="w-3 h-3" />{activeParticipants.length} participantes</span>
               <span className="flex items-center gap-1"><Zap className="w-3 h-3" />{community.potenciaInstalada} kWp</span>
-              <span className="font-mono text-[10px] bg-secondary px-1.5 py-0.5 rounded">CAU: {community.cau}</span>
-              <span className="text-[10px] bg-secondary px-1.5 py-0.5 rounded">{community.distribuidora.toUpperCase()}</span>
+              <span className="font-mono text-[10px] bg-muted px-1.5 py-0.5 rounded">CAU: {community.cau}</span>
+              <span className="text-[10px] bg-muted px-1.5 py-0.5 rounded">{community.distribuidora.toUpperCase()}</span>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Phase Progress Bar (7 steps) */}
-      <div className="border border-border rounded-lg p-4">
+      {/* Phase Progress — thin elegant bar */}
+      <div className="bg-card border border-border rounded-xl p-4">
         <div className="flex items-center gap-1">
           {PROJECT_PHASES.map((p, i) => (
             <div key={p.id} className="flex items-center flex-1">
-              <div className={`flex items-center gap-1.5 px-2 py-1.5 rounded-md text-[10px] font-medium w-full justify-center transition-all ${
+              <div className={`flex items-center gap-1.5 px-2.5 py-2 rounded-lg text-[10px] font-medium w-full justify-center transition-all ${
                 p.step < currentPhaseStep ? "bg-primary text-primary-foreground" :
-                p.step === currentPhaseStep ? "bg-primary/15 text-primary border border-primary/30" :
+                p.step === currentPhaseStep ? "bg-primary/10 text-primary ring-1 ring-primary/20" :
                 "bg-muted text-muted-foreground"
               }`}>
-                {p.step < currentPhaseStep ? <CheckCircle2 className="w-3 h-3" /> : <span>{p.step}</span>}
+                {p.step < currentPhaseStep ? <CheckCircle2 className="w-3 h-3" /> : <span className="text-[9px]">{p.step}</span>}
                 <span className="hidden lg:inline">{p.label}</span>
               </div>
               {i < PROJECT_PHASES.length - 1 && (
@@ -120,8 +104,14 @@ const CommunityDetail = () => {
       </div>
 
       {/* Validation Banner */}
-      {(errors.length > 0 || warnings.length > 0) && (
-        <div className="border border-border rounded-lg p-4 space-y-2">
+      {!dismissedBanner && (errors.length > 0 || warnings.length > 0) && (
+        <div className="bg-card border border-border rounded-xl p-4 space-y-2 relative">
+          <button
+            onClick={() => setDismissedBanner(true)}
+            className="absolute top-3 right-3 p-1 rounded hover:bg-muted transition-colors"
+          >
+            <X className="w-3.5 h-3.5 text-muted-foreground" />
+          </button>
           {errors.map((e, i) => (
             <div key={`e${i}`} className="flex items-start gap-2 text-xs">
               <AlertCircle className="w-3.5 h-3.5 text-destructive flex-shrink-0 mt-0.5" />
@@ -133,8 +123,8 @@ const CommunityDetail = () => {
           ))}
           {warnings.map((w, i) => (
             <div key={`w${i}`} className="flex items-start gap-2 text-xs">
-              <AlertTriangle className="w-3.5 h-3.5 text-amber-500 flex-shrink-0 mt-0.5" />
-              <span className="text-amber-600">{w.message}</span>
+              <AlertTriangle className="w-3.5 h-3.5 text-muted-foreground flex-shrink-0 mt-0.5" />
+              <span className="text-muted-foreground">{w.message}</span>
               {w.action && (
                 <button className="ml-auto text-[10px] font-medium text-primary hover:underline whitespace-nowrap">{w.action}</button>
               )}
@@ -143,22 +133,22 @@ const CommunityDetail = () => {
         </div>
       )}
 
-      {/* Tabs */}
-      <div className="border-b border-border/50">
-        <nav className="flex gap-0.5 -mb-px overflow-x-auto">
+      {/* Tabs — clean underline style */}
+      <div className="border-b border-border">
+        <nav className="flex gap-0 -mb-px overflow-x-auto">
           {tabs.map((tab) => (
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`px-3.5 py-2 text-xs font-medium transition-all border-b-2 rounded-t-lg whitespace-nowrap ${
+              className={`px-4 py-2.5 text-xs font-medium transition-all border-b-2 whitespace-nowrap ${
                 activeTab === tab.id
-                  ? "border-primary text-primary bg-primary/5"
+                  ? "border-primary text-primary"
                   : "border-transparent text-muted-foreground hover:text-foreground hover:border-border"
               }`}
             >
               {tab.label}
               {tab.id === "coefficients" && (
-                <span className={`ml-1.5 text-[9px] px-1 py-0.5 rounded ${betaValid ? "bg-primary/15 text-primary" : "bg-accent/15 text-accent"}`}>
+                <span className={`ml-1.5 text-[9px] px-1 py-0.5 rounded ${betaValid ? "badge-active" : "badge-warning"}`}>
                   {betaValid ? "✓" : `${(totalBeta * 100).toFixed(0)}%`}
                 </span>
               )}
@@ -170,8 +160,8 @@ const CommunityDetail = () => {
       {/* Content */}
       <div key={activeTab}>
         {activeTab === "overview" && (
-          <div className="space-y-5 animate-fade-in">
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+          <div className="space-y-6 animate-fade-in">
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
               <KpiCard icon={Zap} title="Producción hoy" value={185} suffix=" kWh" trend="+8%" delay={0} />
               <KpiCard icon={Users} title="Participantes activos" value={activeParticipants.length} delay={100} />
               <KpiCard icon={TrendingUp} title="Ahorro mensual" value={340} prefix="€" trend="+12%" delay={200} />
@@ -179,19 +169,19 @@ const CommunityDetail = () => {
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-              <div className="glass-card rounded-2xl p-5">
-                <h3 className="font-heading font-semibold text-sm mb-3">Coeficientes β</h3>
+              <div className="bg-card border border-border rounded-xl p-5">
+                <h3 className="font-semibold text-sm mb-3 text-foreground">Coeficientes β</h3>
                 <div className="flex items-center justify-between mb-2">
                   <span className="text-xs text-muted-foreground">Suma total</span>
-                  <span className={`text-sm font-mono font-bold ${betaValid ? "text-primary" : "text-accent"}`}>
+                  <span className={`text-sm font-mono font-bold ${betaValid ? "text-primary" : "text-destructive"}`}>
                     {(totalBeta * 100).toFixed(2)}%
                   </span>
                 </div>
-                <div className="h-2 bg-muted rounded-full overflow-hidden">
-                  <div className={`h-full rounded-full transition-all duration-500 ${betaValid ? "solar-gradient" : "bg-accent/70"}`}
+                <div className="h-1.5 bg-muted rounded-full overflow-hidden">
+                  <div className={`h-full rounded-full transition-all duration-500 ${betaValid ? "bg-primary" : "bg-destructive/60"}`}
                     style={{ width: `${Math.min(totalBeta * 100, 100)}%` }} />
                 </div>
-                <p className={`text-[10px] mt-2 ${betaValid ? "text-primary" : "text-accent"}`}>
+                <p className={`text-[10px] mt-2 ${betaValid ? "text-primary" : "text-destructive"}`}>
                   {betaValid ? "✓ Válido — listo para generar TXT" : "⚠ Ajusta coeficientes para generar fichero"}
                 </p>
               </div>

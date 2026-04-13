@@ -1,31 +1,109 @@
-import { User, Bell, FileText } from "lucide-react";
+import { User, Bell, FileText, Mail, Building2, Phone } from "lucide-react";
+import { useState } from "react";
 
 const SettingsPage = () => {
+  const [activeSection, setActiveSection] = useState<string | null>(null);
+
+  const sections = [
+    { id: "profile", icon: User, title: "Perfil", desc: "Nombre, empresa y datos de contacto" },
+    { id: "notifications", icon: Bell, title: "Notificaciones", desc: "Preferencias de alertas y avisos" },
+    { id: "templates", icon: FileText, title: "Plantillas", desc: "Personaliza tus documentos de reparto" },
+  ];
+
   return (
     <div className="max-w-3xl mx-auto space-y-6 animate-fade-in">
       <div>
-        <h1 className="text-2xl font-heading font-bold text-foreground">Configuración</h1>
+        <h1 className="text-xl font-bold text-foreground">Configuración</h1>
         <p className="text-muted-foreground text-sm mt-0.5">Gestiona tu cuenta y preferencias</p>
       </div>
 
-      {[
-        { icon: User, title: "Perfil", desc: "Nombre, empresa y datos de contacto" },
-        { icon: Bell, title: "Notificaciones", desc: "Preferencias de alertas y avisos" },
-        { icon: FileText, title: "Plantillas", desc: "Personaliza tus documentos de reparto" },
-      ].map((item, i) => (
-        <button
-          key={i}
-          className="glass-card rounded-2xl p-5 w-full text-left hover-lift flex items-center gap-4 group"
-        >
-          <div className="w-10 h-10 rounded-xl bg-secondary flex items-center justify-center group-hover:bg-primary/10 transition-colors">
-            <item.icon className="w-5 h-5 text-muted-foreground group-hover:text-primary transition-colors" />
+      {/* Profile section — always visible */}
+      <div className="bg-card border border-border rounded-xl overflow-hidden">
+        <div className="p-5 border-b border-border">
+          <h2 className="text-sm font-semibold text-foreground flex items-center gap-2">
+            <User className="w-4 h-4 text-primary" /> Perfil
+          </h2>
+        </div>
+        <div className="p-5 space-y-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label className="text-[10px] text-muted-foreground uppercase tracking-wider font-semibold mb-1.5 block">Nombre completo</label>
+              <input type="text" defaultValue="Martí Tarragó Anton" className="w-full px-3 py-2.5 rounded-lg bg-muted/50 border border-border text-sm text-foreground focus:outline-none focus:ring-1 focus:ring-primary/20" />
+            </div>
+            <div>
+              <label className="text-[10px] text-muted-foreground uppercase tracking-wider font-semibold mb-1.5 block">Empresa</label>
+              <input type="text" defaultValue="Repartio SL" className="w-full px-3 py-2.5 rounded-lg bg-muted/50 border border-border text-sm text-foreground focus:outline-none focus:ring-1 focus:ring-primary/20" />
+            </div>
           </div>
-          <div>
-            <h3 className="font-heading font-medium text-foreground">{item.title}</h3>
-            <p className="text-sm text-muted-foreground">{item.desc}</p>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label className="text-[10px] text-muted-foreground uppercase tracking-wider font-semibold mb-1.5 block flex items-center gap-1"><Mail className="w-3 h-3" /> Email</label>
+              <input type="email" defaultValue="martitarragoa@gmail.com" className="w-full px-3 py-2.5 rounded-lg bg-muted/50 border border-border text-sm text-foreground focus:outline-none focus:ring-1 focus:ring-primary/20" />
+            </div>
+            <div>
+              <label className="text-[10px] text-muted-foreground uppercase tracking-wider font-semibold mb-1.5 block flex items-center gap-1"><Phone className="w-3 h-3" /> Teléfono</label>
+              <input type="tel" defaultValue="+34 612 345 678" className="w-full px-3 py-2.5 rounded-lg bg-muted/50 border border-border text-sm text-foreground focus:outline-none focus:ring-1 focus:ring-primary/20" />
+            </div>
           </div>
-        </button>
-      ))}
+          <div className="flex justify-end pt-2">
+            <button className="px-4 py-2 rounded-lg bg-primary text-primary-foreground text-xs font-medium hover:bg-primary/90 transition-colors">
+              Guardar cambios
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* Notifications */}
+      <div className="bg-card border border-border rounded-xl overflow-hidden">
+        <div className="p-5 border-b border-border">
+          <h2 className="text-sm font-semibold text-foreground flex items-center gap-2">
+            <Bell className="w-4 h-4 text-primary" /> Notificaciones
+          </h2>
+        </div>
+        <div className="p-5 space-y-3">
+          {[
+            { label: "Nuevas firmas de participantes", desc: "Recibe un aviso cuando un vecino firma el acuerdo" },
+            { label: "Cambios de estado", desc: "Cuando una comunidad avanza de fase" },
+            { label: "Errores de validación", desc: "Alertas sobre coeficientes o documentos incorrectos" },
+            { label: "Resumen semanal", desc: "Email con el progreso de todas tus comunidades" },
+          ].map((item, i) => (
+            <label key={i} className="flex items-start gap-3 py-2 cursor-pointer group">
+              <input type="checkbox" defaultChecked={i < 3} className="mt-0.5 w-4 h-4 rounded border-border text-primary focus:ring-primary/20 accent-primary" />
+              <div>
+                <p className="text-sm text-foreground font-medium group-hover:text-primary transition-colors">{item.label}</p>
+                <p className="text-xs text-muted-foreground">{item.desc}</p>
+              </div>
+            </label>
+          ))}
+        </div>
+      </div>
+
+      {/* Templates */}
+      <div className="bg-card border border-border rounded-xl overflow-hidden">
+        <div className="p-5 border-b border-border">
+          <h2 className="text-sm font-semibold text-foreground flex items-center gap-2">
+            <FileText className="w-4 h-4 text-primary" /> Plantillas de documentos
+          </h2>
+        </div>
+        <div className="p-5">
+          <div className="space-y-2">
+            {[
+              { name: "Acuerdo de reparto", type: "PDF" },
+              { name: "Fichero TXT distribuidora", type: "TXT" },
+              { name: "Certificado de instalación", type: "PDF" },
+            ].map((doc, i) => (
+              <div key={i} className="flex items-center justify-between px-3 py-2.5 rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors">
+                <div className="flex items-center gap-2.5">
+                  <FileText className="w-4 h-4 text-muted-foreground" />
+                  <span className="text-sm text-foreground">{doc.name}</span>
+                  <span className="text-[10px] bg-muted px-1.5 py-0.5 rounded font-mono text-muted-foreground">{doc.type}</span>
+                </div>
+                <button className="text-xs text-primary hover:underline">Editar</button>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
     </div>
   );
 };
