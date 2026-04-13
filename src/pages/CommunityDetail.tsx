@@ -178,34 +178,31 @@ const CommunityDetail = () => {
               <KpiCard icon={Leaf} title="CO₂ evitado" value={420} suffix=" kg" delay={300} />
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-              <div className="lg:col-span-2"><SolarProductionChart /></div>
-              <div className="space-y-4">
-                <div className="glass-card rounded-2xl p-5">
-                  <h3 className="font-heading font-semibold text-sm mb-3">Coeficientes β</h3>
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-xs text-muted-foreground">Suma total</span>
-                    <span className={`text-sm font-mono font-bold ${betaValid ? "text-primary" : "text-accent"}`}>
-                      {(totalBeta * 100).toFixed(2)}%
-                    </span>
-                  </div>
-                  <div className="h-2 bg-muted rounded-full overflow-hidden">
-                    <div className={`h-full rounded-full transition-all duration-500 ${betaValid ? "solar-gradient" : "bg-accent/70"}`}
-                      style={{ width: `${Math.min(totalBeta * 100, 100)}%` }} />
-                  </div>
-                  <p className={`text-[10px] mt-2 ${betaValid ? "text-primary" : "text-accent"}`}>
-                    {betaValid ? "✓ Válido — listo para generar TXT" : "⚠ Ajusta coeficientes para generar fichero"}
-                  </p>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+              <div className="glass-card rounded-2xl p-5">
+                <h3 className="font-heading font-semibold text-sm mb-3">Coeficientes β</h3>
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-xs text-muted-foreground">Suma total</span>
+                  <span className={`text-sm font-mono font-bold ${betaValid ? "text-primary" : "text-accent"}`}>
+                    {(totalBeta * 100).toFixed(2)}%
+                  </span>
                 </div>
-
-                <GestorPanel
-                  enabled={gestorEnabled}
-                  gestorName={gestorName}
-                  gestorNif={gestorNif}
-                  onToggle={setGestorEnabled}
-                  onUpdate={(n, nif) => { setGestorName(n); setGestorNif(nif); }}
-                />
+                <div className="h-2 bg-muted rounded-full overflow-hidden">
+                  <div className={`h-full rounded-full transition-all duration-500 ${betaValid ? "solar-gradient" : "bg-accent/70"}`}
+                    style={{ width: `${Math.min(totalBeta * 100, 100)}%` }} />
+                </div>
+                <p className={`text-[10px] mt-2 ${betaValid ? "text-primary" : "text-accent"}`}>
+                  {betaValid ? "✓ Válido — listo para generar TXT" : "⚠ Ajusta coeficientes para generar fichero"}
+                </p>
               </div>
+
+              <GestorPanel
+                enabled={gestorEnabled}
+                gestorName={gestorName}
+                gestorNif={gestorNif}
+                onToggle={setGestorEnabled}
+                onUpdate={(n, nif) => { setGestorName(n); setGestorNif(nif); }}
+              />
             </div>
           </div>
         )}
