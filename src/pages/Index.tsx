@@ -212,7 +212,7 @@ const Index = () => {
   }, []);
 
   return (
-    <div className="max-w-5xl mx-auto space-y-8 animate-fade-in pb-28">
+    <div className="max-w-5xl mx-auto space-y-8 animate-fade-in pb-6">
       {/* 1. Welcome */}
       <div className="space-y-1">
         <h1 className="text-2xl font-bold solar-gradient-text">Panel de Control</h1>
