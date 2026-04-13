@@ -28,10 +28,10 @@ const Index = () => {
     <div className="max-w-5xl mx-auto space-y-5 animate-fade-in">
       {/* Header */}
       <div className="flex items-center justify-between">
-        <h1 className="text-lg font-semibold text-foreground">Panel de Control</h1>
+        <h1 className="text-lg font-semibold solar-gradient-text">Panel de Control</h1>
         <button
           onClick={() => navigate("/communities/new")}
-          className="flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-primary text-primary-foreground text-xs font-medium hover:bg-primary/90 transition-colors"
+          className="flex items-center gap-1.5 px-3.5 py-2 rounded-lg solar-gradient text-white text-xs font-medium hover:opacity-90 transition-opacity shadow-sm glow-primary"
         >
           <Plus className="w-3.5 h-3.5" /> Nueva comunidad
         </button>
