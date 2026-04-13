@@ -3,14 +3,14 @@
 // 7 project phases per RD 244/2019 workflow
 export type ProjectPhase = "configuracion" | "vecinos" | "reparto" | "firmas" | "listo" | "enviado" | "activo";
 
-export const PROJECT_PHASES: { id: ProjectPhase; label: string; step: number }[] = [
-  { id: "configuracion", label: "Configuración", step: 1 },
-  { id: "vecinos", label: "Vecinos", step: 2 },
-  { id: "reparto", label: "Reparto", step: 3 },
-  { id: "firmas", label: "Firmas", step: 4 },
-  { id: "listo", label: "Listo", step: 5 },
-  { id: "enviado", label: "Enviado", step: 6 },
-  { id: "activo", label: "Activo", step: 7 },
+export const PROJECT_PHASES: { id: ProjectPhase; label: string; step: number; desc: string }[] = [
+  { id: "configuracion", label: "Configuración", step: 1, desc: "Datos de la comunidad e instalación" },
+  { id: "vecinos", label: "Vecinos", step: 2, desc: "Añade los participantes y sus CUPS" },
+  { id: "reparto", label: "Reparto", step: 3, desc: "Asigna los coeficientes β de reparto" },
+  { id: "firmas", label: "Firmas", step: 4, desc: "Recoge las firmas de los participantes" },
+  { id: "listo", label: "Listo", step: 5, desc: "Documentación completa, lista para enviar" },
+  { id: "enviado", label: "Enviado", step: 6, desc: "Enviado a la distribuidora, pendiente de activación" },
+  { id: "activo", label: "Activo", step: 7, desc: "Comunidad activa y en funcionamiento" },
 ];
 
 // 4 modalities
