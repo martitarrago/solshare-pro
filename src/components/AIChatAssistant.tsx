@@ -161,7 +161,11 @@ export function AIChatAssistant() {
                 ? "bg-primary text-primary-foreground rounded-br-sm"
                 : "bg-secondary text-foreground rounded-bl-sm"
             }`}>
-              {m.content}
+              {m.role === "assistant" ? (
+                <div className="prose prose-xs prose-neutral [&_p]:m-0 [&_ul]:m-0 [&_ol]:m-0 [&_li]:m-0 [&_strong]:text-foreground">
+                  <ReactMarkdown>{m.content}</ReactMarkdown>
+                </div>
+              ) : m.content}
             </div>
             {m.role === "user" && (
               <div className="w-6 h-6 rounded-md bg-secondary flex items-center justify-center flex-shrink-0 mt-0.5">
