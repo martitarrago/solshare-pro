@@ -35,9 +35,11 @@ export function KpiCard({ title, value, suffix = "", prefix = "", icon: Icon, tr
   }, [value, delay]);
 
   return (
-    <div className="border border-border rounded-lg p-4 hover:bg-muted/40 transition-colors">
+    <div className="glass-card rounded-xl p-4 hover-lift">
       <div className="flex items-center gap-2 mb-3">
-        <Icon className="w-4 h-4 text-muted-foreground" />
+        <div className="w-7 h-7 rounded-lg solar-gradient flex items-center justify-center">
+          <Icon className="w-3.5 h-3.5 text-white" />
+        </div>
         <span className="text-xs text-muted-foreground">{title}</span>
         {trend && (
           <span className="text-[11px] font-medium text-primary ml-auto">
