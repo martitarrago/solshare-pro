@@ -7,7 +7,6 @@ import { AppLayout } from "@/components/layout/AppLayout";
 import Index from "./pages/Index";
 import Communities from "./pages/Communities";
 import CommunityDetail from "./pages/CommunityDetail";
-import Savings from "./pages/Savings";
 import SettingsPage from "./pages/SettingsPage";
 import NewCommunity from "./pages/NewCommunity";
 import NotFound from "./pages/NotFound";
@@ -26,7 +25,6 @@ const App = () => (
             <Route path="/communities" element={<Communities />} />
             <Route path="/communities/new" element={<NewCommunity />} />
             <Route path="/communities/:id" element={<CommunityDetail />} />
-            <Route path="/savings" element={<Savings />} />
             <Route path="/settings" element={<SettingsPage />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
