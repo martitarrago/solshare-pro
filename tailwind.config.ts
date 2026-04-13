@@ -14,8 +14,15 @@ export default {
     },
     extend: {
       fontFamily: {
-        heading: ["Inter", "system-ui", "sans-serif"],
-        body: ["Inter", "system-ui", "sans-serif"],
+        heading: ["Geist", "system-ui", "sans-serif"],
+        body: ["Geist", "system-ui", "sans-serif"],
+        mono: ["Geist Mono", "ui-monospace", "monospace"],
+      },
+      fontSize: {
+        "page-title": ["20px", { lineHeight: "1.3", letterSpacing: "0.01em", fontWeight: "600" }],
+        "card-title": ["15px", { lineHeight: "1.4", letterSpacing: "0.01em", fontWeight: "600" }],
+        "body": ["13px", { lineHeight: "1.5", fontWeight: "400" }],
+        "meta": ["11px", { lineHeight: "1.45", fontWeight: "400" }],
       },
       colors: {
         border: "hsl(var(--border))",
