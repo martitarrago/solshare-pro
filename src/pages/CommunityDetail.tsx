@@ -44,17 +44,21 @@ const CommunityDetail = () => {
   const [admin, setAdmin] = useState(baseCommunity.admin || "");
   const [cau, setCau] = useState(baseCommunity.cau);
   const [power, setPower] = useState(String(baseCommunity.potenciaInstalada));
+  const [modality, setModality] = useState(baseCommunity.modality);
+  const [connectionType, setConnectionType] = useState(baseCommunity.connectionType);
+  const [proximity, setProximity] = useState(baseCommunity.proximity);
 
   const community = useMemo(() => ({
     ...baseCommunity,
     name, address, city, postalCode, cif, admin, cau,
     potenciaInstalada: parseFloat(power) || baseCommunity.potenciaInstalada,
+    modality, connectionType, proximity,
     participants,
     coeficientMode: coefMode,
     gestorEnabled,
     gestorName,
     gestorNif,
-  }), [baseCommunity, name, address, city, postalCode, cif, admin, cau, power, participants, coefMode, gestorEnabled, gestorName, gestorNif]);
+  }), [baseCommunity, name, address, city, postalCode, cif, admin, cau, power, modality, connectionType, proximity, participants, coefMode, gestorEnabled, gestorName, gestorNif]);
 
   const activeParticipants = participants.filter(p => p.status !== "exited");
   const totalBeta = activeParticipants.reduce((s, p) => s + p.beta, 0);
