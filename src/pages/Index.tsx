@@ -1,8 +1,9 @@
-import { useState, useEffect, useMemo, useCallback } from "react";
+import { useState, useEffect, useMemo, useCallback, useRef } from "react";
 import { useNavigate } from "react-router-dom";
+import ReactMarkdown from "react-markdown";
 import {
-  AlertCircle, FileCheck, Send, Zap, ChevronDown, ChevronRight,
-  Sparkles, Clock, ArrowRight, Plus, ExternalLink,
+  AlertCircle, FileCheck, Send, Zap, ChevronRight,
+  Sparkles, Clock, ArrowRight, Plus, ExternalLink, Loader2, X,
 } from "lucide-react";
 
 // ── Mock data matching the user's spec ──────────────────────────────────────
@@ -99,9 +100,97 @@ function useTypewriter(texts: string[], typingSpeed = 45, pauseMs = 2000) {
 
 // ── Component ───────────────────────────────────────────────────────────────
 
+const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/chat`;
+type Msg = { role: "user" | "assistant"; content: string };
+
 const Index = () => {
   const navigate = useNavigate();
   const placeholder = useTypewriter(PLACEHOLDER_TEXTS);
+
+  // Chat state
+  const [chatInput, setChatInput] = useState("");
+  const [chatMessages, setChatMessages] = useState<Msg[]>([]);
+  const [chatLoading, setChatLoading] = useState(false);
+  const [chatOpen, setChatOpen] = useState(false);
+  const chatEndRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [chatMessages]);
+
+  const sendChat = async (text: string) => {
+    if (!text.trim() || chatLoading) return;
+    const userMsg: Msg = { role: "user", content: text.trim() };
+    const allMessages = [...chatMessages, userMsg];
+    setChatMessages(allMessages);
+    setChatInput("");
+    setChatLoading(true);
+    setChatOpen(true);
+
+    let assistantSoFar = "";
+    const upsert = (chunk: string) => {
+      assistantSoFar += chunk;
+      setChatMessages(prev => {
+        const last = prev[prev.length - 1];
+        if (last?.role === "assistant") {
+          return prev.map((m, i) => i === prev.length - 1 ? { ...m, content: assistantSoFar } : m);
+        }
+        return [...prev, { role: "assistant", content: assistantSoFar }];
+      });
+    };
+
+    try {
+      const resp = await fetch(CHAT_URL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+        },
+        body: JSON.stringify({ messages: allMessages }),
+      });
+
+      if (!resp.ok || !resp.body) {
+        const err = await resp.json().catch(() => ({ error: "Error de red" }));
+        upsert(`⚠️ ${err.error || "Error al contactar el asistente"}`);
+        setChatLoading(false);
+        return;
+      }
+
+      const reader = resp.body.getReader();
+      const decoder = new TextDecoder();
+      let textBuffer = "";
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        textBuffer += decoder.decode(value, { stream: true });
+
+        let newlineIndex: number;
+        while ((newlineIndex = textBuffer.indexOf("\n")) !== -1) {
+          let line = textBuffer.slice(0, newlineIndex);
+          textBuffer = textBuffer.slice(newlineIndex + 1);
+          if (line.endsWith("\r")) line = line.slice(0, -1);
+          if (line.startsWith(":") || line.trim() === "") continue;
+          if (!line.startsWith("data: ")) continue;
+          const jsonStr = line.slice(6).trim();
+          if (jsonStr === "[DONE]") break;
+          try {
+            const parsed = JSON.parse(jsonStr);
+            const content = parsed.choices?.[0]?.delta?.content as string | undefined;
+            if (content) upsert(content);
+          } catch {
+            textBuffer = line + "\n" + textBuffer;
+            break;
+          }
+        }
+      }
+    } catch (e) {
+      console.error(e);
+      upsert("⚠️ Error de conexión. Inténtalo de nuevo.");
+    }
+
+    setChatLoading(false);
+  };
 
   const grouped = useMemo(() => {
     const map: Record<PipelineState, MockCommunity[]> = {
@@ -123,7 +212,7 @@ const Index = () => {
   }, []);
 
   return (
-    <div className="max-w-5xl mx-auto space-y-8 animate-fade-in pb-28">
+    <div className="max-w-5xl mx-auto space-y-8 animate-fade-in pb-6">
       {/* 1. Welcome */}
       <div className="space-y-1">
         <h1 className="text-2xl font-bold solar-gradient-text">Panel de Control</h1>
@@ -246,29 +335,74 @@ const Index = () => {
         </div>
       </div>
 
-      {/* 5. Sticky AI Chat Bar */}
-      <div className="fixed bottom-0 left-0 right-0 z-40 pointer-events-none">
-        <div className="max-w-5xl mx-auto px-6 pb-4 pointer-events-auto">
-          <p className="text-xs text-muted-foreground mb-2 flex items-center gap-1.5 pl-1">
-            <Sparkles className="w-3.5 h-3.5 text-primary" />
-            Pregunta lo que necesites sobre tus comunidades al asistente de IA
-          </p>
-          <div className="relative flex items-center gap-3 bg-card/95 backdrop-blur-xl border border-border rounded-2xl px-4 py-3 shadow-xl shadow-primary/5">
-            <Sparkles className="w-5 h-5 text-primary flex-shrink-0" />
-            <input
-              type="text"
-              placeholder={placeholder + "▏"}
-              className="flex-1 bg-transparent text-sm outline-none placeholder:text-muted-foreground/60 text-foreground"
-              onFocus={() => {
-                window.dispatchEvent(new CustomEvent("open-ai-chat"));
-              }}
-              readOnly
-            />
-            <div className="flex items-center gap-1.5 text-xs text-muted-foreground bg-muted/60 px-2.5 py-1 rounded-lg">
-              <Sparkles className="w-3 h-3" /> IA
+      {/* 5. Inline AI Chat */}
+      <div className="space-y-3">
+        <p className="text-xs text-muted-foreground flex items-center gap-1.5">
+          <Sparkles className="w-3.5 h-3.5 text-primary" />
+          Pregunta lo que necesites sobre tus comunidades al asistente de IA
+        </p>
+
+        {/* Chat messages area */}
+        {chatOpen && chatMessages.length > 0 && (
+          <div className="border border-border rounded-xl bg-card/50 backdrop-blur-sm overflow-hidden">
+            <div className="flex items-center justify-between px-4 py-2 border-b border-border">
+              <span className="text-xs font-medium text-muted-foreground flex items-center gap-1.5">
+                <Sparkles className="w-3 h-3 text-primary" /> Asistente IA
+              </span>
+              <button onClick={() => { setChatOpen(false); setChatMessages([]); }} className="p-1 rounded hover:bg-muted/50 transition-colors">
+                <X className="w-3.5 h-3.5 text-muted-foreground" />
+              </button>
+            </div>
+            <div className="max-h-80 overflow-y-auto px-4 py-3 space-y-3">
+              {chatMessages.map((m, i) => (
+                <div key={i} className={`flex gap-2 ${m.role === "user" ? "justify-end" : "justify-start"}`}>
+                  <div className={`max-w-[85%] text-sm leading-relaxed px-3 py-2 rounded-xl ${
+                    m.role === "user"
+                      ? "bg-primary text-primary-foreground rounded-br-sm"
+                      : "bg-muted text-foreground rounded-bl-sm"
+                  }`}>
+                    {m.role === "assistant" ? (
+                      <div className="prose prose-sm prose-neutral [&_p]:m-0 [&_ul]:m-0 [&_ol]:m-0 [&_li]:m-0 [&_strong]:text-foreground">
+                        <ReactMarkdown>{m.content}</ReactMarkdown>
+                      </div>
+                    ) : m.content}
+                  </div>
+                </div>
+              ))}
+              {chatLoading && chatMessages[chatMessages.length - 1]?.role !== "assistant" && (
+                <div className="flex gap-2">
+                  <div className="bg-muted text-foreground text-sm px-3 py-2 rounded-xl rounded-bl-sm">
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                  </div>
+                </div>
+              )}
+              <div ref={chatEndRef} />
             </div>
           </div>
-        </div>
+        )}
+
+        {/* Input bar */}
+        <form
+          onSubmit={(e) => { e.preventDefault(); sendChat(chatInput); }}
+          className="relative flex items-center gap-3 bg-card/95 backdrop-blur-xl border border-border rounded-2xl px-4 py-3 shadow-xl shadow-primary/5"
+        >
+          <Sparkles className="w-5 h-5 text-primary flex-shrink-0" />
+          <input
+            type="text"
+            value={chatInput}
+            onChange={(e) => setChatInput(e.target.value)}
+            placeholder={chatInput ? "" : placeholder + "▏"}
+            className="flex-1 bg-transparent text-sm outline-none placeholder:text-muted-foreground/60 text-foreground"
+            disabled={chatLoading}
+          />
+          <button
+            type="submit"
+            disabled={!chatInput.trim() || chatLoading}
+            className="p-2 rounded-lg bg-primary text-primary-foreground disabled:opacity-40 hover:bg-primary/90 transition-colors"
+          >
+            <Send className="w-4 h-4" />
+          </button>
+        </form>
       </div>
     </div>
   );
