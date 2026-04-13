@@ -1,5 +1,5 @@
 import { useParams, useNavigate } from "react-router-dom";
-import { ArrowLeft, MapPin, Users, Zap, Sun, TrendingUp, Leaf, ShieldCheck, FileText, Hash, AlertCircle, AlertTriangle, CheckCircle2 } from "lucide-react";
+import { ArrowLeft, MapPin, Users, Zap, TrendingUp, Leaf, ShieldCheck, FileText, Hash, AlertCircle, AlertTriangle, CheckCircle2 } from "lucide-react";
 import { useState, useMemo } from "react";
 import { BetaCoefficients } from "@/components/community/BetaCoefficients";
 import { ParticipantsListPro } from "@/components/community/ParticipantsListPro";
