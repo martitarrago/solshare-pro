@@ -249,6 +249,10 @@ const Index = () => {
       {/* 5. Sticky AI Chat Bar */}
       <div className="fixed bottom-0 left-0 right-0 z-40 pointer-events-none">
         <div className="max-w-5xl mx-auto px-6 pb-4 pointer-events-auto">
+          <p className="text-xs text-muted-foreground mb-2 flex items-center gap-1.5 pl-1">
+            <Sparkles className="w-3.5 h-3.5 text-primary" />
+            Pregunta lo que necesites sobre tus comunidades al asistente de IA
+          </p>
           <div className="relative flex items-center gap-3 bg-card/95 backdrop-blur-xl border border-border rounded-2xl px-4 py-3 shadow-xl shadow-primary/5">
             <Sparkles className="w-5 h-5 text-primary flex-shrink-0" />
             <input
