@@ -48,14 +48,14 @@
     --glass-border: 80 10% 87% / 0.5;
 
     /* Sidebar */
-    --sidebar-background: 152 25% 10%;
-    --sidebar-foreground: 80 10% 60%;
-    --sidebar-primary: 48 96% 53%;
-    --sidebar-primary-foreground: 152 25% 10%;
-    --sidebar-accent: 152 20% 16%;
-    --sidebar-accent-foreground: 80 15% 92%;
-    --sidebar-border: 152 20% 16%;
-    --sidebar-ring: 48 96% 53%;
+    --sidebar-background: 80 15% 97%;
+    --sidebar-foreground: 150 20% 10%;
+    --sidebar-primary: 145 65% 36%;
+    --sidebar-primary-foreground: 80 15% 97%;
+    --sidebar-accent: 80 10% 93%;
+    --sidebar-accent-foreground: 150 20% 10%;
+    --sidebar-border: 80 10% 90%;
+    --sidebar-ring: 145 65% 36%;
   }
 }
 
