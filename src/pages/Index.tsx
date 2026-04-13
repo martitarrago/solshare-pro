@@ -273,10 +273,6 @@ const Index = () => {
                   </span>
                 </div>
 
-                {/* Connector dots */}
-                {i < 3 && (
-                  <div className="absolute top-[3.25rem] -right-1 w-2 h-2 rounded-full bg-border z-20" />
-                )}
               </button>
             );
           })}
