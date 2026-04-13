@@ -61,7 +61,7 @@ const PLACEHOLDER_TEXTS = [
   "Envía la documentación de Urbanización Las Encinas",
 ];
 
-function useTypewriter(texts: string[], typingSpeed = 45, pauseMs = 2000) {
+function useTypewriter(texts: string[], typingSpeed = 80, pauseMs = 3500) {
   const [display, setDisplay] = useState("");
   const [idx, setIdx] = useState(0);
   const [charIdx, setCharIdx] = useState(0);
