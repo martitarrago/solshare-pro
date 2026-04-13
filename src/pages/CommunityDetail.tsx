@@ -44,17 +44,21 @@ const CommunityDetail = () => {
   const [admin, setAdmin] = useState(baseCommunity.admin || "");
   const [cau, setCau] = useState(baseCommunity.cau);
   const [power, setPower] = useState(String(baseCommunity.potenciaInstalada));
+  const [modality, setModality] = useState(baseCommunity.modality);
+  const [connectionType, setConnectionType] = useState(baseCommunity.connectionType);
+  const [proximity, setProximity] = useState(baseCommunity.proximity);
 
   const community = useMemo(() => ({
     ...baseCommunity,
     name, address, city, postalCode, cif, admin, cau,
     potenciaInstalada: parseFloat(power) || baseCommunity.potenciaInstalada,
+    modality, connectionType, proximity,
     participants,
     coeficientMode: coefMode,
     gestorEnabled,
     gestorName,
     gestorNif,
-  }), [baseCommunity, name, address, city, postalCode, cif, admin, cau, power, participants, coefMode, gestorEnabled, gestorName, gestorNif]);
+  }), [baseCommunity, name, address, city, postalCode, cif, admin, cau, power, modality, connectionType, proximity, participants, coefMode, gestorEnabled, gestorName, gestorNif]);
 
   const activeParticipants = participants.filter(p => p.status !== "exited");
   const totalBeta = activeParticipants.reduce((s, p) => s + p.beta, 0);
@@ -227,7 +231,7 @@ const CommunityDetail = () => {
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="text-[10px] text-muted-foreground mb-1.5 block uppercase tracking-wider font-semibold">Distribuidora</label>
                   <div className="px-3 py-3 rounded-lg bg-muted/50 border border-border text-sm text-foreground">
@@ -236,15 +240,23 @@ const CommunityDetail = () => {
                 </div>
                 <div>
                   <label className="text-[10px] text-muted-foreground mb-1.5 block uppercase tracking-wider font-semibold">Modalidad</label>
-                  <div className="px-3 py-3 rounded-lg bg-muted/50 border border-border text-sm text-foreground truncate">
-                    {MODALITIES.find(m => m.id === community.modality)?.label}
-                  </div>
+                  <select value={modality} onChange={(e) => setModality(e.target.value as any)} className={inputClass}>
+                    {MODALITIES.map(m => <option key={m.id} value={m.id}>{m.label}</option>)}
+                  </select>
+                </div>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="text-[10px] text-muted-foreground mb-1.5 block uppercase tracking-wider font-semibold">Tipo de conexión</label>
+                  <select value={connectionType} onChange={(e) => setConnectionType(e.target.value as any)} className={inputClass}>
+                    {CONNECTION_TYPES.map(ct => <option key={ct.id} value={ct.id}>{ct.label}</option>)}
+                  </select>
                 </div>
                 <div>
-                  <label className="text-[10px] text-muted-foreground mb-1.5 block uppercase tracking-wider font-semibold">Conexión</label>
-                  <div className="px-3 py-3 rounded-lg bg-muted/50 border border-border text-sm text-foreground truncate">
-                    {CONNECTION_TYPES.find(ct => ct.id === community.connectionType)?.label}
-                  </div>
+                  <label className="text-[10px] text-muted-foreground mb-1.5 block uppercase tracking-wider font-semibold">Proximidad</label>
+                  <select value={proximity} onChange={(e) => setProximity(e.target.value as any)} className={inputClass}>
+                    {PROXIMITY_CRITERIA.map(pc => <option key={pc.id} value={pc.id}>{pc.label}</option>)}
+                  </select>
                 </div>
               </div>
             </div>
