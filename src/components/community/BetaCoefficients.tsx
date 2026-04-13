@@ -213,7 +213,7 @@ export function BetaCoefficients({ participants, mode, onModeChange, onParticipa
               );
             })}
           </svg>
-          <div className="absolute flex flex-col items-center justify-center">
+          <div className="absolute inset-0 flex flex-col items-center justify-center">
             <span className={`text-2xl font-heading font-bold ${isComplete ? "text-primary" : isOver ? "text-destructive" : "text-foreground"}`}>
               {totalPercent.toFixed(1)}%
             </span>
