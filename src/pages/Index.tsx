@@ -5,44 +5,35 @@ import {
   AlertCircle, FileCheck, Send, Zap, ChevronRight,
   Sparkles, Clock, ArrowRight, Plus, ExternalLink, Loader2, X, CheckCircle2,
 } from "lucide-react";
-
-// ── Mock data ───────────────────────────────────────────────────────────────
-
-interface MockCommunity {
-  id: number;
-  nombre: string;
-  estado: "faltan_datos" | "pendiente_firma" | "listo_para_enviar" | "activado";
-  errores: string[];
-  fechaActivacion?: string;
-  firmasPendientes?: string;
-}
-
-interface MockMovimiento {
-  comunidad: string;
-  accion: string;
-  fecha: string;
-}
-
-const comunidades: MockCommunity[] = [
-  { id: 1, nombre: "Edificio Lumina", estado: "faltan_datos", errores: ["La suma de coeficientes es 0.630000, debe ser 1.000000", "2 firma(s) pendiente(s)", "Documentos pendientes: CIE"] },
-  { id: 2, nombre: "Torres del Parque", estado: "faltan_datos", errores: ["La suma de coeficientes es 0.370000, debe ser 1.000000", "Documentos pendientes: Acuerdo de reparto, Fichero TXT, CIE"] },
-  { id: 3, nombre: "Polígono Solar Norte", estado: "faltan_datos", errores: ["La suma de coeficientes es 0.270000, debe ser 1.000000"] },
-  { id: 4, nombre: "Urbanización Las Encinas", estado: "listo_para_enviar", errores: [] },
-  { id: 5, nombre: "Residencial Aurora", estado: "pendiente_firma", errores: ["2 firma(s) pendiente(s)"], firmasPendientes: "10 de 12 propietarios han firmado" },
-  { id: 6, nombre: "Comunidad Solar Vallés", estado: "activado", fechaActivacion: "2026-03-15", errores: [] },
-];
-
-const ultimosMovimientos: MockMovimiento[] = [
-  { comunidad: "Residencial Aurora", accion: "María García ha firmado el acuerdo de reparto", fecha: "Hace 2 horas" },
-  { comunidad: "Edificio Lumina", accion: "Estado cambiado de 'Configuración' a 'Vecinos'", fecha: "Hace 1 día" },
-  { comunidad: "Urbanización Las Encinas", accion: "Documentación lista para enviar a distribuidora", fecha: "Hace 2 días" },
-  { comunidad: "Comunidad Solar Vallés", accion: "Comunidad activada por la distribuidora", fecha: "Hace 5 días" },
-  { comunidad: "Torres del Parque", accion: "Pedro López subió el documento CIE", fecha: "Hace 1 semana" },
-];
+import { mockCommunities } from "@/lib/mock-data";
+import { validateProject, validateAllocationSum, Community } from "@/lib/types";
 
 // ── Pipeline states ─────────────────────────────────────────────────────────
 
 type PipelineState = "faltan_datos" | "pendiente_firma" | "listo_para_enviar" | "activado";
+
+function derivePipelineState(c: Community): PipelineState {
+  if (c.phase === "activo" || c.phase === "enviado") return "activado";
+  const issues = validateProject(c);
+  const errors = issues.filter(i => i.type === "error");
+  if (errors.length > 0) return "faltan_datos";
+  const active = c.participants.filter(p => p.status !== "exited");
+  const pendingSigs = active.filter(p => p.signatureState === "pending").length;
+  if (pendingSigs > 0) return "pendiente_firma";
+  const alloc = validateAllocationSum(c.participants);
+  const hasTxt = c.documents.txt;
+  if (alloc.valid && hasTxt && active.every(p => p.signatureState === "signed")) return "listo_para_enviar";
+  return "faltan_datos";
+}
+
+interface DerivedCommunity {
+  id: string;
+  nombre: string;
+  estado: PipelineState;
+  errores: string[];
+  fechaActivacion?: string;
+  firmasPendientes?: string;
+}
 
 const PIPELINE: { id: PipelineState; label: string; icon: typeof AlertCircle; badgeClass: string }[] = [
   { id: "faltan_datos", label: "Faltan datos", icon: AlertCircle, badgeClass: "badge-warning" },
@@ -51,12 +42,43 @@ const PIPELINE: { id: PipelineState; label: string; icon: typeof AlertCircle; ba
   { id: "activado", label: "Activado", icon: Zap, badgeClass: "badge-active" },
 ];
 
+// ── Derive communities from mock data ───────────────────────────────────────
+
+function buildDerivedCommunities(): DerivedCommunity[] {
+  return mockCommunities.map(c => {
+    const estado = derivePipelineState(c);
+    const issues = validateProject(c);
+    const active = c.participants.filter(p => p.status !== "exited");
+    const pendingSigs = active.filter(p => p.signatureState === "pending").length;
+    const signed = active.filter(p => p.signatureState === "signed").length;
+
+    return {
+      id: c.id,
+      nombre: c.name,
+      estado,
+      errores: issues.filter(i => i.type === "error").map(i => i.message)
+        .concat(issues.filter(i => i.type === "warning").map(i => i.message)),
+      fechaActivacion: estado === "activado" ? c.createdAt : undefined,
+      firmasPendientes: pendingSigs > 0 ? `${signed} de ${active.length} participantes han firmado` : undefined,
+    };
+  });
+}
+
+// ── Activity feed (derived from mock data) ──────────────────────────────────
+
+const ultimosMovimientos = [
+  { comunidad: "Residencial Aurora", accion: "Comunidad activa y en funcionamiento", fecha: "Hace 2 días" },
+  { comunidad: "Edificio Lumina", accion: "Pendiente de firmas de participantes", fecha: "Hace 1 día" },
+  { comunidad: "Torres del Parque", accion: "Coeficientes de reparto actualizados", fecha: "Hace 3 días" },
+  { comunidad: "Urbanización Las Encinas", accion: "Documentación lista para enviar a distribuidora", fecha: "Hace 5 días" },
+  { comunidad: "Polígono Solar Norte", accion: "Nuevo participante añadido", fecha: "Hace 1 semana" },
+];
+
 // ── Typewriter hook ─────────────────────────────────────────────────────────
 
 const PLACEHOLDER_TEXTS = [
   "¿Cuántas comunidades tengo pendientes de firma?",
   "¿Qué errores tiene el Edificio Lumina?",
-  "¿Cuándo se activó Residencial Aurora?",
   "¿Cuál es el siguiente paso para Torres del Parque?",
   "Envía la documentación de Urbanización Las Encinas",
 ];
@@ -192,13 +214,15 @@ const Index = () => {
     setChatLoading(false);
   };
 
+  const comunidades = useMemo(() => buildDerivedCommunities(), []);
+
   const grouped = useMemo(() => {
-    const map: Record<PipelineState, MockCommunity[]> = {
+    const map: Record<PipelineState, DerivedCommunity[]> = {
       faltan_datos: [], pendiente_firma: [], listo_para_enviar: [], activado: [],
     };
     comunidades.forEach(c => map[c.estado].push(c));
     return map;
-  }, []);
+  }, [comunidades]);
 
   const defaultExpanded = useMemo(() => {
     return PIPELINE.find(p => grouped[p.id].length > 0)?.id ?? "faltan_datos";
@@ -282,7 +306,7 @@ const Index = () => {
       {/* 3. Pipeline — Horizontal Stepper */}
       <div className="bg-card border border-border rounded-xl p-4">
         <div className="grid grid-cols-4 gap-2">
-          {PIPELINE.map((state, i) => {
+          {PIPELINE.map((state) => {
             const count = grouped[state.id].length;
             const isActive = activeState === state.id;
             const Icon = state.icon;
@@ -374,7 +398,7 @@ const Index = () => {
 
 // ── Community Row ───────────────────────────────────────────────────────────
 
-function CommunityRow({ community: com, onNavigate }: { community: MockCommunity; onNavigate: () => void }) {
+function CommunityRow({ community: com, onNavigate }: { community: DerivedCommunity; onNavigate: () => void }) {
   const [expanded, setExpanded] = useState(false);
 
   return (
@@ -393,7 +417,7 @@ function CommunityRow({ community: com, onNavigate }: { community: MockCommunity
         )}
         {com.estado === "pendiente_firma" && (
           <span className="text-[10px] px-2 py-0.5 rounded-full badge-info font-medium">
-            {com.firmasPendientes || com.errores[0]}
+            {com.firmasPendientes || "Firmas pendientes"}
           </span>
         )}
         {com.estado === "listo_para_enviar" && (
@@ -420,7 +444,7 @@ function CommunityRow({ community: com, onNavigate }: { community: MockCommunity
           {com.estado === "pendiente_firma" && (
             <div className="flex items-start gap-2 text-xs">
               <FileCheck className="w-3.5 h-3.5 text-primary mt-0.5 flex-shrink-0" />
-              <span className="text-muted-foreground">{com.firmasPendientes || com.errores[0]}</span>
+              <span className="text-muted-foreground">{com.firmasPendientes || "Pendientes de firma"}</span>
             </div>
           )}
 

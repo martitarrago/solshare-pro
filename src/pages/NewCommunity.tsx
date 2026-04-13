@@ -320,8 +320,6 @@ const NewCommunityWizard = () => {
                 <p className="text-xs text-foreground">CAU: <span className="font-mono">{cau}</span></p>
                 <p className="text-xs text-foreground">Potencia: {power} kWp</p>
                 <p className="text-xs text-foreground">Modalidad: {MODALITIES.find(m => m.id === modality)?.label}</p>
-                <p className="text-xs text-foreground">Conexión: {CONNECTION_TYPES.find(ct => ct.id === connectionType)?.label}</p>
-                <p className="text-xs text-foreground">Proximidad: {PROXIMITY_CRITERIA.find(pc => pc.id === proximity)?.label}</p>
               </div>
 
               <div className="border border-border rounded-lg p-4 space-y-1.5">

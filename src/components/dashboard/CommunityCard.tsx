@@ -1,6 +1,7 @@
 import { Users, Zap, ShieldCheck, AlertTriangle } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { ProjectPhase, PROJECT_PHASES } from "@/lib/types";
+
+export type ProjectStatus = "borrador" | "validado" | "activo";
 
 interface CommunityCardProps {
   id: string;
@@ -9,29 +10,23 @@ interface CommunityCardProps {
   participants: number;
   power: number;
   distributed: number;
-  phase: ProjectPhase;
+  projectStatus: ProjectStatus;
   gestorEnabled?: boolean;
   distribuidora?: string;
   cau?: string;
   issues?: number;
   warnings?: number;
-  documentProgress?: { done: number; total: number };
 }
 
-const phaseConfig: Record<ProjectPhase, { label: string; badgeClass: string }> = {
-  configuracion: { label: "Configuración", badgeClass: "bg-muted text-muted-foreground" },
-  vecinos: { label: "Vecinos", badgeClass: "badge-info" },
-  reparto: { label: "Reparto", badgeClass: "badge-warning" },
-  firmas: { label: "Firmas", badgeClass: "badge-warning" },
-  listo: { label: "Listo", badgeClass: "badge-success" },
-  enviado: { label: "Enviado", badgeClass: "badge-info" },
+const statusConfig: Record<ProjectStatus, { label: string; badgeClass: string }> = {
+  borrador: { label: "Borrador", badgeClass: "bg-muted text-muted-foreground" },
+  validado: { label: "Validado", badgeClass: "badge-success" },
   activo: { label: "Activo", badgeClass: "badge-active" },
 };
 
-export function CommunityCard({ id, name, address, participants, power, distributed, phase, gestorEnabled, issues }: CommunityCardProps) {
+export function CommunityCard({ id, name, address, participants, power, distributed, projectStatus, gestorEnabled, issues }: CommunityCardProps) {
   const navigate = useNavigate();
-  const phaseInfo = phaseConfig[phase];
-  const phaseStep = PROJECT_PHASES.find(p => p.id === phase)?.step || 1;
+  const statusInfo = statusConfig[projectStatus];
 
   return (
     <button
@@ -42,8 +37,8 @@ export function CommunityCard({ id, name, address, participants, power, distribu
         <h3 className="text-sm font-semibold text-foreground group-hover:text-primary transition-colors leading-snug">
           {name}
         </h3>
-        <span className={`text-[10px] font-medium px-2 py-0.5 rounded-full flex-shrink-0 ml-2 ${phaseInfo.badgeClass}`}>
-          {phaseInfo.label}
+        <span className={`text-[10px] font-medium px-2 py-0.5 rounded-full flex-shrink-0 ml-2 ${statusInfo.badgeClass}`}>
+          {statusInfo.label}
         </span>
       </div>
 
@@ -61,18 +56,6 @@ export function CommunityCard({ id, name, address, participants, power, distribu
         <div className="flex items-center gap-1"><Zap className="w-3.5 h-3.5" />{power} kWp</div>
         {gestorEnabled && <ShieldCheck className="w-3.5 h-3.5 text-primary" />}
         <div className="ml-auto text-[11px] tabular-nums font-semibold text-foreground">{distributed}%</div>
-      </div>
-
-      {/* Phase progress */}
-      <div className="mt-3 flex gap-0.5">
-        {PROJECT_PHASES.map((p) => (
-          <div
-            key={p.id}
-            className={`h-1 flex-1 rounded-full transition-all ${
-              p.step <= phaseStep ? "bg-primary" : "bg-muted"
-            }`}
-          />
-        ))}
       </div>
     </button>
   );
