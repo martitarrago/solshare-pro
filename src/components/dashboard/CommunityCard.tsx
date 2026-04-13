@@ -35,7 +35,7 @@ export function CommunityCard({ id, name, address, participants, power, distribu
   return (
     <button
       onClick={() => navigate(`/communities/${id}`)}
-      className="border border-border rounded-lg p-4 text-left hover:bg-muted/40 transition-colors w-full group"
+      className="glass-card rounded-xl p-4 text-left hover-lift w-full group"
     >
       <div className="flex items-start justify-between mb-2">
         <h3 className="text-sm font-medium text-foreground group-hover:text-primary transition-colors">
@@ -79,12 +79,12 @@ export function CommunityCard({ id, name, address, participants, power, distribu
       </div>
 
       {/* Step checklist progress */}
-      <div className="mt-2 flex gap-0.5">
+      <div className="mt-2.5 flex gap-0.5">
         {PROJECT_PHASES.map((p) => (
           <div
             key={p.id}
-            className={`h-1 flex-1 rounded-full transition-all ${
-              p.step <= phaseStep ? "bg-primary" : "bg-muted"
+            className={`h-1.5 flex-1 rounded-full transition-all ${
+              p.step <= phaseStep ? "solar-gradient" : "bg-muted"
             }`}
           />
         ))}
