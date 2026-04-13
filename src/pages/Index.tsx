@@ -335,29 +335,74 @@ const Index = () => {
         </div>
       </div>
 
-      {/* 5. Sticky AI Chat Bar */}
-      <div className="fixed bottom-0 left-0 right-0 z-40 pointer-events-none">
-        <div className="max-w-5xl mx-auto px-6 pb-4 pointer-events-auto">
-          <p className="text-xs text-muted-foreground mb-2 flex items-center gap-1.5 pl-1">
-            <Sparkles className="w-3.5 h-3.5 text-primary" />
-            Pregunta lo que necesites sobre tus comunidades al asistente de IA
-          </p>
-          <div className="relative flex items-center gap-3 bg-card/95 backdrop-blur-xl border border-border rounded-2xl px-4 py-3 shadow-xl shadow-primary/5">
-            <Sparkles className="w-5 h-5 text-primary flex-shrink-0" />
-            <input
-              type="text"
-              placeholder={placeholder + "▏"}
-              className="flex-1 bg-transparent text-sm outline-none placeholder:text-muted-foreground/60 text-foreground"
-              onFocus={() => {
-                window.dispatchEvent(new CustomEvent("open-ai-chat"));
-              }}
-              readOnly
-            />
-            <div className="flex items-center gap-1.5 text-xs text-muted-foreground bg-muted/60 px-2.5 py-1 rounded-lg">
-              <Sparkles className="w-3 h-3" /> IA
+      {/* 5. Inline AI Chat */}
+      <div className="space-y-3">
+        <p className="text-xs text-muted-foreground flex items-center gap-1.5">
+          <Sparkles className="w-3.5 h-3.5 text-primary" />
+          Pregunta lo que necesites sobre tus comunidades al asistente de IA
+        </p>
+
+        {/* Chat messages area */}
+        {chatOpen && chatMessages.length > 0 && (
+          <div className="border border-border rounded-xl bg-card/50 backdrop-blur-sm overflow-hidden">
+            <div className="flex items-center justify-between px-4 py-2 border-b border-border">
+              <span className="text-xs font-medium text-muted-foreground flex items-center gap-1.5">
+                <Sparkles className="w-3 h-3 text-primary" /> Asistente IA
+              </span>
+              <button onClick={() => { setChatOpen(false); setChatMessages([]); }} className="p-1 rounded hover:bg-muted/50 transition-colors">
+                <X className="w-3.5 h-3.5 text-muted-foreground" />
+              </button>
+            </div>
+            <div className="max-h-80 overflow-y-auto px-4 py-3 space-y-3">
+              {chatMessages.map((m, i) => (
+                <div key={i} className={`flex gap-2 ${m.role === "user" ? "justify-end" : "justify-start"}`}>
+                  <div className={`max-w-[85%] text-sm leading-relaxed px-3 py-2 rounded-xl ${
+                    m.role === "user"
+                      ? "bg-primary text-primary-foreground rounded-br-sm"
+                      : "bg-muted text-foreground rounded-bl-sm"
+                  }`}>
+                    {m.role === "assistant" ? (
+                      <div className="prose prose-sm prose-neutral [&_p]:m-0 [&_ul]:m-0 [&_ol]:m-0 [&_li]:m-0 [&_strong]:text-foreground">
+                        <ReactMarkdown>{m.content}</ReactMarkdown>
+                      </div>
+                    ) : m.content}
+                  </div>
+                </div>
+              ))}
+              {chatLoading && chatMessages[chatMessages.length - 1]?.role !== "assistant" && (
+                <div className="flex gap-2">
+                  <div className="bg-muted text-foreground text-sm px-3 py-2 rounded-xl rounded-bl-sm">
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                  </div>
+                </div>
+              )}
+              <div ref={chatEndRef} />
             </div>
           </div>
-        </div>
+        )}
+
+        {/* Input bar */}
+        <form
+          onSubmit={(e) => { e.preventDefault(); sendChat(chatInput); }}
+          className="relative flex items-center gap-3 bg-card/95 backdrop-blur-xl border border-border rounded-2xl px-4 py-3 shadow-xl shadow-primary/5"
+        >
+          <Sparkles className="w-5 h-5 text-primary flex-shrink-0" />
+          <input
+            type="text"
+            value={chatInput}
+            onChange={(e) => setChatInput(e.target.value)}
+            placeholder={chatInput ? "" : placeholder + "▏"}
+            className="flex-1 bg-transparent text-sm outline-none placeholder:text-muted-foreground/60 text-foreground"
+            disabled={chatLoading}
+          />
+          <button
+            type="submit"
+            disabled={!chatInput.trim() || chatLoading}
+            className="p-2 rounded-lg bg-primary text-primary-foreground disabled:opacity-40 hover:bg-primary/90 transition-colors"
+          >
+            <Send className="w-4 h-4" />
+          </button>
+        </form>
       </div>
     </div>
   );
