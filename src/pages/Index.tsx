@@ -100,9 +100,97 @@ function useTypewriter(texts: string[], typingSpeed = 45, pauseMs = 2000) {
 
 // ── Component ───────────────────────────────────────────────────────────────
 
+const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/chat`;
+type Msg = { role: "user" | "assistant"; content: string };
+
 const Index = () => {
   const navigate = useNavigate();
   const placeholder = useTypewriter(PLACEHOLDER_TEXTS);
+
+  // Chat state
+  const [chatInput, setChatInput] = useState("");
+  const [chatMessages, setChatMessages] = useState<Msg[]>([]);
+  const [chatLoading, setChatLoading] = useState(false);
+  const [chatOpen, setChatOpen] = useState(false);
+  const chatEndRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [chatMessages]);
+
+  const sendChat = async (text: string) => {
+    if (!text.trim() || chatLoading) return;
+    const userMsg: Msg = { role: "user", content: text.trim() };
+    const allMessages = [...chatMessages, userMsg];
+    setChatMessages(allMessages);
+    setChatInput("");
+    setChatLoading(true);
+    setChatOpen(true);
+
+    let assistantSoFar = "";
+    const upsert = (chunk: string) => {
+      assistantSoFar += chunk;
+      setChatMessages(prev => {
+        const last = prev[prev.length - 1];
+        if (last?.role === "assistant") {
+          return prev.map((m, i) => i === prev.length - 1 ? { ...m, content: assistantSoFar } : m);
+        }
+        return [...prev, { role: "assistant", content: assistantSoFar }];
+      });
+    };
+
+    try {
+      const resp = await fetch(CHAT_URL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+        },
+        body: JSON.stringify({ messages: allMessages }),
+      });
+
+      if (!resp.ok || !resp.body) {
+        const err = await resp.json().catch(() => ({ error: "Error de red" }));
+        upsert(`⚠️ ${err.error || "Error al contactar el asistente"}`);
+        setChatLoading(false);
+        return;
+      }
+
+      const reader = resp.body.getReader();
+      const decoder = new TextDecoder();
+      let textBuffer = "";
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        textBuffer += decoder.decode(value, { stream: true });
+
+        let newlineIndex: number;
+        while ((newlineIndex = textBuffer.indexOf("\n")) !== -1) {
+          let line = textBuffer.slice(0, newlineIndex);
+          textBuffer = textBuffer.slice(newlineIndex + 1);
+          if (line.endsWith("\r")) line = line.slice(0, -1);
+          if (line.startsWith(":") || line.trim() === "") continue;
+          if (!line.startsWith("data: ")) continue;
+          const jsonStr = line.slice(6).trim();
+          if (jsonStr === "[DONE]") break;
+          try {
+            const parsed = JSON.parse(jsonStr);
+            const content = parsed.choices?.[0]?.delta?.content as string | undefined;
+            if (content) upsert(content);
+          } catch {
+            textBuffer = line + "\n" + textBuffer;
+            break;
+          }
+        }
+      }
+    } catch (e) {
+      console.error(e);
+      upsert("⚠️ Error de conexión. Inténtalo de nuevo.");
+    }
+
+    setChatLoading(false);
+  };
 
   const grouped = useMemo(() => {
     const map: Record<PipelineState, MockCommunity[]> = {
