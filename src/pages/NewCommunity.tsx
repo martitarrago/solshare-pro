@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, ArrowRight, Building2, Zap, Users, Plus, X, Check, Sun, Hash, Sliders, FileCheck } from "lucide-react";
+import { ArrowLeft, ArrowRight, Building2, Zap, Users, Plus, X, Check, Sun, Sliders, FileCheck } from "lucide-react";
 import { DISTRIBUIDORAS, Distribuidora, MODALITIES, Modality, CONNECTION_TYPES, ConnectionType, PROXIMITY_CRITERIA, ProximityCriteria, validateCUPS, validateCAU, detectDistribuidora } from "@/lib/types";
 
 interface NewParticipant {
@@ -185,20 +185,6 @@ const NewCommunityWizard = () => {
             <div>
               <label className="text-[10px] text-muted-foreground mb-1.5 block uppercase tracking-wider font-semibold">Potencia (kWp) *</label>
               <input type="number" placeholder="Ej. 45" value={power} onChange={(e) => setPower(e.target.value)} className={inputClass} />
-            </div>
-            <div>
-              <label className="text-[10px] text-muted-foreground mb-1.5 block uppercase tracking-wider font-semibold">Modalidad</label>
-              <div className="space-y-2">
-                {MODALITIES.map(m => (
-                  <button key={m.id} onClick={() => setModality(m.id)}
-                    className={`w-full text-left px-4 py-3 rounded-lg border transition-all text-sm ${
-                      modality === m.id ? "border-primary bg-primary/5 text-primary ring-1 ring-primary/20" : "border-border bg-muted/30 text-foreground hover:border-primary/30"
-                    }`}>
-                    <p className="text-xs font-medium">{m.label}</p>
-                    <p className="text-[10px] text-muted-foreground mt-0.5">{m.description}</p>
-                  </button>
-                ))}
-              </div>
             </div>
             <div className="grid grid-cols-2 gap-3">
               <div>
