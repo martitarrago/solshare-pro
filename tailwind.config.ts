@@ -68,6 +68,7 @@ export default {
           emerald: "hsl(var(--solar-emerald))",
           leaf: "hsl(var(--solar-leaf))",
           sand: "hsl(var(--solar-sand))",
+          lime: "hsl(var(--solar-lime))",
         },
       },
       borderRadius: {
