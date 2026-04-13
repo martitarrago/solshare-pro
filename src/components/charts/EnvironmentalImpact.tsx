@@ -2,9 +2,9 @@ import { Leaf, TreePine, Droplets, Wind } from "lucide-react";
 
 const metrics = [
   { icon: Leaf, value: "2.840 kg", label: "CO₂ evitado", description: "Equivalente a retirar 2 coches de la carretera", color: "text-primary" },
-  { icon: TreePine, value: "142", label: "Árboles equivalentes", description: "La cantidad de árboles necesarios para absorber ese CO₂", color: "text-solar-emerald" },
-  { icon: Droplets, value: "18.500 L", label: "Agua ahorrada", description: "Agua no usada en la generación de energía convencional", color: "text-solar-sky" },
-  { icon: Wind, value: "4.200 kWh", label: "Energía limpia", description: "Energía renovable producida y consumida localmente", color: "text-solar-gold" },
+  { icon: TreePine, value: "142", label: "Árboles equivalentes", description: "La cantidad de árboles necesarios para absorber ese CO₂", color: "text-primary" },
+  { icon: Droplets, value: "18.500 L", label: "Agua ahorrada", description: "Agua no usada en la generación de energía convencional", color: "text-accent" },
+  { icon: Wind, value: "4.200 kWh", label: "Energía limpia", description: "Energía renovable producida y consumida localmente", color: "text-accent" },
 ];
 
 export function EnvironmentalImpact() {

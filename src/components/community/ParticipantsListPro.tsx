@@ -92,7 +92,7 @@ export function ParticipantsListPro({ participants, onParticipantsChange }: Part
           </button>
           <button
             onClick={() => setShowAddForm(!showAddForm)}
-            className="flex items-center gap-1.5 px-4 py-2 rounded-xl solar-gradient text-white font-medium text-xs hover:opacity-90 transition-opacity shadow-md shadow-primary/20"
+            className="flex items-center gap-1.5 px-4 py-2 rounded-xl mint-gradient text-white font-medium text-xs hover:opacity-90 transition-opacity shadow-md shadow-primary/20"
           >
             {showAddForm ? <X className="w-3.5 h-3.5" /> : <Plus className="w-3.5 h-3.5" />}
             {showAddForm ? "Cancelar" : "Añadir"}

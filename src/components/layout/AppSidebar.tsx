@@ -36,7 +36,7 @@ export function AppSidebar() {
     <Sidebar collapsible="icon" className="border-r-0">
       <SidebarHeader className="px-4 py-5">
         <NavLink to="/" className="flex items-center gap-2.5 group">
-          <div className="w-8 h-8 rounded-lg solar-gradient flex items-center justify-center shadow-sm">
+          <div className="w-8 h-8 rounded-lg mint-gradient flex items-center justify-center shadow-sm">
             <Zap className="w-4 h-4 text-sidebar-primary-foreground" />
           </div>
           {!collapsed && (
