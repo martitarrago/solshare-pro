@@ -1,31 +1,38 @@
 import { useParams, useNavigate } from "react-router-dom";
-import { MapPin, Users, Zap, ShieldCheck, FileText, Hash, AlertCircle, AlertTriangle, CheckCircle2, X, Building2, Sliders, Pen } from "lucide-react";
+import { MapPin, Users, Zap, FileText, AlertCircle, AlertTriangle, CheckCircle2, X, Building2, Hash, Circle } from "lucide-react";
 import { useState, useMemo } from "react";
 import { BetaCoefficients } from "@/components/community/BetaCoefficients";
 import { ParticipantsListPro } from "@/components/community/ParticipantsListPro";
 import { DocumentsTab } from "@/components/community/DocumentsTab";
-import { SignaturesTab } from "@/components/community/SignaturesTab";
 import { TxtGeneratorTab } from "@/components/community/TxtGeneratorTab";
 import { GestorPanel } from "@/components/community/GestorPanel";
 import { mockCommunities } from "@/lib/mock-data";
 import {
-  Participant, CoeficientMode, PROJECT_PHASES, validateProject,
+  Participant, CoeficientMode, validateProject,
   MODALITIES, CONNECTION_TYPES, PROXIMITY_CRITERIA, DISTRIBUIDORAS,
+  validateCUPS, validateCAU,
 } from "@/lib/types";
 
-// Steps mirror the wizard flow
+// 4 workflow steps
 const STEPS = [
-  { id: "datos", label: "Datos", icon: Building2 },
+  { id: "detalles", label: "Detalles", icon: Building2 },
   { id: "participantes", label: "Participantes", icon: Users },
-  { id: "coeficientes", label: "Coeficientes β", icon: Hash },
-  { id: "documentos", label: "Documentos", icon: FileText },
-  { id: "firmas", label: "Firmas", icon: Pen },
-];
+  { id: "coeficientes", label: "Coeficientes", icon: Hash },
+  { id: "documento", label: "Documento", icon: FileText },
+] as const;
+
+type StepId = (typeof STEPS)[number]["id"];
+type StepStatus = "complete" | "error" | "pending";
+
+function deriveProjectStatus(community: { name: string; cau: string; createdAt: string; documents: { txt: boolean } }, stepsAllComplete: boolean): { label: string; className: string } {
+  if (community.documents.txt && stepsAllComplete) return { label: "Validado", className: "bg-primary/10 text-primary" };
+  return { label: "Borrador", className: "bg-muted text-muted-foreground" };
+}
 
 const CommunityDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const [activeStep, setActiveStep] = useState("datos");
+  const [activeStep, setActiveStep] = useState<StepId>("detalles");
 
   const baseCommunity = mockCommunities.find(c => c.id === id) || mockCommunities[0];
 
@@ -35,7 +42,7 @@ const CommunityDetail = () => {
   const [gestorName, setGestorName] = useState(baseCommunity.gestorName || "");
   const [gestorNif, setGestorNif] = useState(baseCommunity.gestorNif || "");
 
-  // Editable community fields
+  // Editable fields
   const [name, setName] = useState(baseCommunity.name);
   const [address, setAddress] = useState(baseCommunity.address);
   const [city, setCity] = useState(baseCommunity.city);
@@ -55,9 +62,7 @@ const CommunityDetail = () => {
     modality, connectionType, proximity,
     participants,
     coeficientMode: coefMode,
-    gestorEnabled,
-    gestorName,
-    gestorNif,
+    gestorEnabled, gestorName, gestorNif,
   }), [baseCommunity, name, address, city, postalCode, cif, admin, cau, power, modality, connectionType, proximity, participants, coefMode, gestorEnabled, gestorName, gestorNif]);
 
   const activeParticipants = participants.filter(p => p.status !== "exited");
@@ -69,20 +74,41 @@ const CommunityDetail = () => {
   const warnings = issues.filter(i => i.type === "warning");
   const [dismissedBanner, setDismissedBanner] = useState(false);
 
-  const currentPhaseStep = PROJECT_PHASES.find(p => p.id === community.phase)?.step || 1;
-  const phaseLabel = PROJECT_PHASES.find(p => p.id === community.phase)?.label || "";
+  // Step completion logic
+  const stepStatuses = useMemo((): Record<StepId, StepStatus> => {
+    // Detalles: complete if name + CAU valid + year exists
+    const hasName = name.trim().length > 0;
+    const cauResult = validateCAU(cau);
+    const hasYear = community.createdAt?.length > 0;
+    const detalles: StepStatus = hasName && cauResult.valid && hasYear ? "complete" : (name.trim() || cau.trim() ? "pending" : "pending");
+
+    // Participantes: complete if ≥1 participant with valid CUPS
+    const validParticipants = activeParticipants.filter(p => validateCUPS(p.cups).valid);
+    const participantes: StepStatus = validParticipants.length > 0 ? "complete" : (activeParticipants.length > 0 ? "error" : "pending");
+
+    // Coeficientes: complete if sum = 1
+    const coeficientes: StepStatus = activeParticipants.length === 0 ? "pending" : (betaValid ? "complete" : "error");
+
+    // Documento: complete if txt generated
+    const documento: StepStatus = community.documents.txt ? "complete" : "pending";
+
+    return { detalles, participantes, coeficientes, documento };
+  }, [name, cau, community, activeParticipants, betaValid]);
+
+  const allComplete = Object.values(stepStatuses).every(s => s === "complete");
+  const projectStatus = deriveProjectStatus(community, allComplete);
 
   const inputClass = "w-full px-3 py-3 rounded-lg bg-muted/50 border border-border text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary/20 transition-all";
 
   return (
     <div className="max-w-5xl mx-auto space-y-6 animate-fade-in">
-      {/* Header — compact */}
+      {/* Header */}
       <div className="flex items-start justify-between">
         <div>
           <div className="flex items-center gap-2.5">
             <h1 className="text-xl font-bold text-foreground">{community.name}</h1>
-            <span className="text-[10px] font-medium px-2 py-0.5 rounded-full badge-info">
-              {phaseLabel}
+            <span className={`text-[10px] font-semibold px-2.5 py-0.5 rounded-full ${projectStatus.className}`}>
+              {projectStatus.label}
             </span>
           </div>
           <div className="flex flex-wrap items-center gap-3 mt-1.5 text-xs text-muted-foreground">
@@ -93,47 +119,57 @@ const CommunityDetail = () => {
         </div>
       </div>
 
-      {/* Phase Progress */}
-      {(() => {
-        const currentPhase = PROJECT_PHASES.find(p => p.id === community.phase);
-        return (
-          <div className="bg-card border border-border rounded-xl p-5 space-y-4">
-            {/* Current phase — prominent */}
-            <div className="flex items-center gap-3">
-              <div className="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center">
-                <span className="text-sm font-bold text-primary">{currentPhase?.step}</span>
-              </div>
-              <div>
-                <p className="text-base font-bold text-foreground">{currentPhase?.label}</p>
-                <p className="text-xs text-muted-foreground">{currentPhase?.desc}</p>
-              </div>
-            </div>
+      {/* 4-step stepper */}
+      <div className="flex items-center gap-0">
+        {STEPS.map((step, i) => {
+          const status = stepStatuses[step.id];
+          const isActive = step.id === activeStep;
+          const Icon = step.icon;
 
-            {/* Mini step bar */}
-            <div className="flex items-center gap-1">
-              {PROJECT_PHASES.map((p, i) => {
-                const isDone = p.step < currentPhaseStep;
-                const isCurrent = p.step === currentPhaseStep;
-                return (
-                  <div key={p.id} className="flex items-center flex-1">
-                    <div className={`flex items-center gap-1 px-1.5 py-1 rounded text-[9px] font-medium w-full justify-center transition-all ${
-                      isDone ? "bg-primary text-primary-foreground" :
-                      isCurrent ? "bg-primary/10 text-primary ring-1 ring-primary/20" :
-                      "bg-muted text-muted-foreground"
-                    }`}>
-                      {isDone ? <CheckCircle2 className="w-2.5 h-2.5" /> : <span>{p.step}</span>}
-                      <span className="hidden xl:inline">{p.label}</span>
-                    </div>
-                    {i < PROJECT_PHASES.length - 1 && (
-                      <div className={`w-1.5 h-0.5 flex-shrink-0 ${isDone ? "bg-primary" : "bg-muted"}`} />
-                    )}
-                  </div>
-                );
-              })}
+          return (
+            <div key={step.id} className="flex items-center flex-1">
+              <button
+                onClick={() => setActiveStep(step.id)}
+                className={`flex items-center gap-2.5 px-4 py-3 rounded-xl text-sm font-medium transition-all w-full ${
+                  isActive
+                    ? "bg-card border border-border shadow-sm"
+                    : "hover:bg-muted/50"
+                }`}
+              >
+                {/* Status indicator */}
+                {status === "complete" ? (
+                  <CheckCircle2 className="w-4.5 h-4.5 text-primary flex-shrink-0" style={{ width: 18, height: 18 }} />
+                ) : status === "error" ? (
+                  <AlertCircle className="w-4.5 h-4.5 text-destructive flex-shrink-0" style={{ width: 18, height: 18 }} />
+                ) : (
+                  <Circle className={`flex-shrink-0 ${isActive ? "text-foreground" : "text-muted-foreground/40"}`} style={{ width: 18, height: 18 }} />
+                )}
+                <div className="text-left min-w-0">
+                  <p className={`text-xs font-semibold leading-tight ${
+                    isActive ? "text-foreground" : "text-muted-foreground"
+                  }`}>
+                    {step.label}
+                  </p>
+                  <p className={`text-[10px] leading-tight mt-0.5 ${
+                    status === "complete" ? "text-primary" :
+                    status === "error" ? "text-destructive" :
+                    "text-muted-foreground/60"
+                  }`}>
+                    {status === "complete" ? "Completado" :
+                     status === "error" ? "Requiere atención" :
+                     "Pendiente"}
+                  </p>
+                </div>
+              </button>
+              {i < STEPS.length - 1 && (
+                <div className={`w-6 h-px flex-shrink-0 ${
+                  stepStatuses[STEPS[i].id] === "complete" ? "bg-primary" : "bg-border"
+                }`} />
+              )}
             </div>
-          </div>
-        );
-      })()}
+          );
+        })}
+      </div>
 
       {/* Validation Banner */}
       {!dismissedBanner && (errors.length > 0 || warnings.length > 0) && (
@@ -157,43 +193,11 @@ const CommunityDetail = () => {
         </div>
       )}
 
-      {/* Step navigation — mirrors wizard */}
-      <div className="flex items-center gap-1">
-        {STEPS.map((s, i) => {
-          const Icon = s.icon;
-          const isActive = s.id === activeStep;
-          return (
-            <div key={s.id} className="flex items-center gap-1 flex-1">
-              <button
-                onClick={() => setActiveStep(s.id)}
-                className={`flex items-center gap-2 px-3 py-2.5 rounded-lg text-xs font-medium transition-all w-full justify-center ${
-                  isActive
-                    ? "bg-primary/10 text-primary ring-1 ring-primary/20"
-                    : "bg-muted text-muted-foreground hover:text-foreground hover:bg-muted/80"
-                }`}
-              >
-                <Icon className="w-3.5 h-3.5" />
-                <span className="hidden sm:inline">{s.label}</span>
-                {s.id === "coeficientes" && (
-                  <span className={`text-[9px] px-1 py-0.5 rounded ${betaValid ? "badge-active" : "badge-warning"}`}>
-                    {betaValid ? "✓" : `${(totalBeta * 100).toFixed(0)}%`}
-                  </span>
-                )}
-              </button>
-              {i < STEPS.length - 1 && (
-                <div className="w-3 h-0.5 rounded-full bg-border flex-shrink-0" />
-              )}
-            </div>
-          );
-        })}
-      </div>
-
       {/* Step content */}
       <div key={activeStep} className="animate-fade-in">
-        {/* STEP: Datos (Community + Installation combined) */}
-        {activeStep === "datos" && (
+        {/* STEP: Detalles */}
+        {activeStep === "detalles" && (
           <div className="space-y-6">
-            {/* Community info */}
             <div className="bg-card border border-border rounded-xl p-6 space-y-4">
               <div className="flex items-center gap-2.5">
                 <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
@@ -201,7 +205,6 @@ const CommunityDetail = () => {
                 </div>
                 <h2 className="text-sm font-semibold text-foreground">Datos de la comunidad</h2>
               </div>
-
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="text-[10px] text-muted-foreground mb-1.5 block uppercase tracking-wider font-semibold">Nombre</label>
@@ -232,7 +235,6 @@ const CommunityDetail = () => {
               </div>
             </div>
 
-            {/* Installation info */}
             <div className="bg-card border border-border rounded-xl p-6 space-y-4">
               <div className="flex items-center gap-2.5">
                 <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
@@ -240,7 +242,6 @@ const CommunityDetail = () => {
                 </div>
                 <h2 className="text-sm font-semibold text-foreground">Datos de la instalación</h2>
               </div>
-
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="text-[10px] text-muted-foreground mb-1.5 block uppercase tracking-wider font-semibold">CAU</label>
@@ -251,7 +252,6 @@ const CommunityDetail = () => {
                   <input type="number" value={power} onChange={(e) => setPower(e.target.value)} className={inputClass} />
                 </div>
               </div>
-
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="text-[10px] text-muted-foreground mb-1.5 block uppercase tracking-wider font-semibold">Distribuidora</label>
@@ -282,7 +282,6 @@ const CommunityDetail = () => {
               </div>
             </div>
 
-            {/* Gestor panel */}
             <GestorPanel
               enabled={gestorEnabled}
               gestorName={gestorName}
@@ -304,16 +303,15 @@ const CommunityDetail = () => {
         {/* STEP: Coeficientes */}
         {activeStep === "coeficientes" && (
           <div className="space-y-4">
-            {/* Quick summary bar */}
             <div className="bg-card border border-border rounded-xl p-4 flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${betaValid ? "bg-primary/10" : "badge-warning"}`}>
-                  <Hash className={`w-4 h-4 ${betaValid ? "text-primary" : ""}`} />
+                <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${betaValid ? "bg-primary/10" : "bg-destructive/10"}`}>
+                  <Hash className={`w-4 h-4 ${betaValid ? "text-primary" : "text-destructive"}`} />
                 </div>
                 <div>
                   <p className="text-sm font-medium text-foreground">Suma de coeficientes</p>
                   <p className={`text-xs ${betaValid ? "text-primary" : "text-destructive"}`}>
-                    {betaValid ? "✓ Válido — listo para generar fichero TXT" : "⚠ Debe sumar exactamente 100%"}
+                    {betaValid ? "✓ Válido — listo para generar documento" : "⚠ Debe sumar exactamente 100%"}
                   </p>
                 </div>
               </div>
@@ -321,7 +319,6 @@ const CommunityDetail = () => {
                 {(totalBeta * 100).toFixed(2)}%
               </span>
             </div>
-
             <BetaCoefficients
               participants={participants}
               mode={coefMode}
@@ -331,19 +328,14 @@ const CommunityDetail = () => {
           </div>
         )}
 
-        {/* STEP: Documentos (TXT + Documents merged) */}
-        {activeStep === "documentos" && (
+        {/* STEP: Documento */}
+        {activeStep === "documento" && (
           <div className="space-y-6">
             <TxtGeneratorTab community={community} />
             <div className="border-t border-border pt-6">
               <DocumentsTab community={community} />
             </div>
           </div>
-        )}
-
-        {/* STEP: Firmas */}
-        {activeStep === "firmas" && (
-          <SignaturesTab community={community} />
         )}
       </div>
     </div>
