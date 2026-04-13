@@ -1,4 +1,4 @@
-import { Home, Building2, BarChart3, Settings, Zap } from "lucide-react";
+import { Home, Building2, Settings, Zap } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { useLocation } from "react-router-dom";
 import {
@@ -10,14 +10,12 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarHeader,
-  SidebarFooter,
   useSidebar,
 } from "@/components/ui/sidebar";
 
 const navItems = [
-  { title: "Inicio", url: "/", icon: Home },
+  { title: "Panel de Control", url: "/", icon: Home },
   { title: "Comunidades", url: "/communities", icon: Building2 },
-  { title: "Ahorros", url: "/savings", icon: BarChart3 },
   { title: "Configuración", url: "/settings", icon: Settings },
 ];
 
