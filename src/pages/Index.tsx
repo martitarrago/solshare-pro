@@ -1,8 +1,9 @@
-import { useState, useEffect, useMemo, useCallback } from "react";
+import { useState, useEffect, useMemo, useCallback, useRef } from "react";
 import { useNavigate } from "react-router-dom";
+import ReactMarkdown from "react-markdown";
 import {
-  AlertCircle, FileCheck, Send, Zap, ChevronDown, ChevronRight,
-  Sparkles, Clock, ArrowRight, Plus, ExternalLink,
+  AlertCircle, FileCheck, Send, Zap, ChevronRight,
+  Sparkles, Clock, ArrowRight, Plus, ExternalLink, Loader2, X,
 } from "lucide-react";
 
 // ── Mock data matching the user's spec ──────────────────────────────────────
